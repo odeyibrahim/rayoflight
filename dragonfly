@@ -1,0 +1,3000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dragonfly Campaign Studio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #121320;
+            --bg-secondary: #121320;
+            --bg-card: rgba(255,255,255,0.05);
+            --bg-card2: rgba(255,255,255,0.3);
+            --bg-glass: rgba(15, 23, 42, 1);
+            --bg-glass-dark: rgba(15, 23, 42, 0.6);
+            --accent-primary: rgba(181,215,142,0.7);
+            --accent-secondary: rgba(140,218,250,0.7);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --blur: blur(20px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.4;
+            min-height: 100vh;
+            backdrop-filter: var(--blur);
+            touch-action: manipulation;
+            font-size: 0.8rem;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .panel-header {
+            background: var(--bg-glass);
+            backdrop-filter: var(--blur);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.75rem 1rem;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            color: var(--accent-primary);
+            font-size: 1rem;
+        }
+
+        .logo h1 {
+            font-size: 1rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary), #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .panel-actions {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        /* Button Styles */
+        .btn {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid rgba(181,215,142,0.7);
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-weight: 400;
+            transition: var(--transition);
+            font-size: 0.7rem;
+            backdrop-filter: var(--blur);
+        }
+
+        .btn-primary {
+            background: transparent;
+            color:#ddd;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #ddd;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            min-width: 300px;
+            background: var(--bg-glass);
+            backdrop-filter: var(--blur);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+            width: 0;
+            min-width: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .sidebar-content {
+            padding: 1rem;
+        }
+
+        .toggle-sidebar {
+            position: absolute;
+            top: 0.8rem;
+            right: 32px;
+            background: var(--bg-glass);
+            backdrop-filter: var(--blur);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: var(--transition);
+            font-size: 0.7rem;
+        }
+
+        .toggle-sidebar:hover {
+            background: var(--bg-card);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--bg-card);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 0.75rem;
+        }
+
+        textarea.form-control {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .platform-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.3rem;
+            margin-top: 0.3rem;
+        }
+
+        .platform-option {
+            background: var(--bg-glass-dark);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            padding: 0.4rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.65rem;
+            backdrop-filter: var(--blur);
+        }
+
+        .platform-option.active {
+            border-color: var(--accent-primary);
+            background: rgba(6, 214, 160, 0.15);
+            box-shadow: 0 0 0 1px var(--accent-primary);
+        }
+
+        .platform-option i {
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 0.2rem;
+        }
+
+        /* Custom Platform Dimensions */
+        .custom-dimensions {
+            background: var(--bg-glass-dark);
+            border-radius: var(--border-radius-sm);
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            display: none;
+            backdrop-filter: var(--blur);
+        }
+
+        .custom-dimensions.active {
+            display: block;
+        }
+
+        .dimension-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.3rem;
+            margin-top: 0.3rem;
+        }
+
+        /* Main Content Area */
+        .main-content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Moodboard Container */
+        .moodboard-container {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: transparent;
+            transition: var(--transition);
+        }
+
+        .moodboard-container.expanded {
+            padding-left: 0.5rem;
+        }
+
+        /* View Controls - Enhanced with filter icon */
+        .view-controls {
+            display: flex;
+            gap: 0.3rem;
+            margin-bottom: 0.8rem;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .view-buttons {
+            display: flex;
+            gap: 0.3rem;
+        }
+
+        .view-btn {
+            background: var(--bg-glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            padding: 0.3rem 0.6rem;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.7rem;
+            backdrop-filter: var(--blur);
+        }
+
+        .view-btn.active {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        .filter-btn {
+            background: var(--bg-glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            padding: 0.3rem 0.6rem;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.7rem;
+            backdrop-filter: var(--blur);
+        }
+
+        .filter-btn.active {
+            background: var(--accent-secondary);
+            color: white;
+            border-color: var(--accent-secondary);
+        }
+
+        /* Filter Panel */
+        .filter-panel {
+            display: none;
+            background: var(--bg-glass);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: var(--blur);
+        }
+
+        .filter-panel.active {
+            display: block;
+        }
+
+        .filter-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.8rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .filter-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .filter-select {
+            background: var(--bg-glass-dark);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 0.4rem 0.6rem;
+            border-radius: var(--border-radius-sm);
+            font-size: 0.7rem;
+            backdrop-filter: var(--blur);
+        }
+
+        /* Moodboard Grid */
+        .moodboard {
+            display: grid;
+            gap: 0.8rem;
+            align-items: start;
+        }
+
+        /* Default desktop view - 3 columns */
+        .moodboard.grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+
+        .moodboard.stack {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .moodboard.list {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+
+        /* Social Feed View */
+        .moodboard.feed {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.3rem;
+        }
+
+        .moodboard.feed .moodboard-card {
+            border-radius: 4px;
+            box-shadow: none;
+            border: none;
+        }
+
+        .moodboard.feed .card-header,
+        .moodboard.feed .card-content {
+            display: none;
+        }
+
+        .moodboard.feed .card-image {
+            border-radius: 4px;
+        }
+
+        /* Moodboard Cards - Enhanced for drag & drop */
+        .moodboard-card {
+            background: var(--bg-glass);
+            backdrop-filter: var(--blur);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .moodboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            padding: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 36px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .drag-handle {
+            cursor: grab;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            transition: var(--transition);
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+
+        .drag-handle:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent-primary);
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .card-platform {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.3rem;
+        }
+
+        .card-action {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: var(--transition);
+            padding: 0.2rem;
+            border-radius: 4px;
+            pointer-events: auto;
+        }
+
+        .card-action:hover {
+            color: var(--accent-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .card-image {
+            background: var(--bg-glass-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-image .placeholder {
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.7rem;
+        }
+
+        .card-image .placeholder i {
+            font-size: 1.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .card-content {
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+
+        .card-title {
+            font-size: 0.8rem;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            margin-bottom: 0.3rem;
+            line-height: 1.3;
+        }
+
+        .card-schedule {
+            color: var(--accent-primary);
+            font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            margin-top: 0.3rem;
+        }
+
+        .card-notification-badges {
+            display: flex;
+            gap: 0.2rem;
+            margin-top: 0.3rem;
+            flex-wrap: wrap;
+        }
+
+        .notification-badge {
+            background: rgba(6, 214, 160, 0.15);
+            color: var(--accent-primary);
+            padding: 0.2rem 0.3rem;
+            border-radius: 6px;
+            font-size: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        /* Custom card layouts */
+        .card-layout-vertical {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-layout-horizontal {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .card-layout-horizontal .card-image {
+            flex: 1;
+            min-height: 120px;
+        }
+
+        .card-layout-horizontal .card-content {
+            flex: 1;
+        }
+
+        /* Platform-specific dimensions */
+        .platform-instagram .card-image { height: 200px; }
+        .platform-instagram-story .card-image { height: 350px; }
+        .platform-tiktok .card-image { height: 400px; }
+        .platform-pinterest .card-image { height: 300px; }
+        .platform-facebook .card-image { height: 180px; }
+        .platform-twitter .card-image { height: 180px; }
+        .platform-linkedin .card-image { height: 170px; }
+        .platform-youtube .card-image { height: 120px; }
+        .platform-custom .card-image { height: 200px; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-secondary);
+            grid-column: 1 / -1;
+            font-size: 0.8rem;
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.5;
+        }
+
+        /* Overlays for Projects and Export */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: var(--blur);
+        }
+
+        .overlay.active {
+            display: flex;
+        }
+
+        .overlay-content {
+            background: var(--bg-glass);
+            backdrop-filter: var(--blur);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .overlay-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .overlay-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.2rem;
+            border-radius: 4px;
+        }
+
+        .overlay-close:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .project-card {
+            background: var(--bg-glass);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .project-card h3 {
+            margin-bottom: 0.3rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .project-card p {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .project-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* Export Options */
+        .export-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+
+        .export-option {
+            background: var(--bg-glass);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .export-option:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .export-option i {
+            font-size: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: var(--accent-primary);
+        }
+
+        /* Edit Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: var(--blur);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-glass);
+            backdrop-filter: var(--blur);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.2rem;
+            border-radius: 4px;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Image Upload Options in Modal */
+        .image-upload-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.5rem;
+            margin: 0.8rem 0;
+        }
+
+        .image-upload-option {
+            background: var(--bg-glass-dark);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            padding: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            backdrop-filter: var(--blur);
+            font-size: 0.7rem;
+        }
+
+        .image-upload-option:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .image-upload-option i {
+            font-size: 1.2rem;
+            margin-bottom: 0.3rem;
+            color: var(--accent-primary);
+        }
+
+        /* Mobile Toggle Button */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: var(--accent-primary);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            z-index: 101;
+            box-shadow: var(--shadow);
+            border: none;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100%;
+                z-index: 100;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .mobile-toggle {
+                display: flex;
+            }
+            
+            .moodboard-card {
+                min-height: 50px;
+            }
+            
+            .card-header {
+                padding: 0.4rem 0.5rem;
+                min-height: 36px;
+            }
+            
+            .moodboard.grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            
+            .moodboard.feed {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .view-controls {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .filter-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Unsplash Results */
+        .unsplash-results {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.3rem;
+            margin-top: 0.8rem;
+        }
+
+        .unsplash-image {
+            width: 100%;
+            height: 60px;
+            object-fit: cover;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .unsplash-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        /* Scheduling Section */
+        .scheduling-content {
+            display: none;
+            margin-top: 0.8rem;
+            padding: 0.8rem;
+            background: var(--bg-glass-dark);
+            border-radius: var(--border-radius-sm);
+        }
+
+        .scheduling-content.active {
+            display: block;
+        }
+
+        .scheduling-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem;
+            background: var(--bg-glass-dark);
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+            font-size: 0.75rem;
+        }
+
+        .scheduling-toggle:hover {
+            background: var(--bg-card);
+        }
+
+        .notification-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            margin-top: 0.3rem;
+        }
+
+        .notification-option {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        /* Layout Options */
+        .layout-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .layout-option {
+            background: var(--bg-glass-dark);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            padding: 0.6rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.7rem;
+        }
+
+        .layout-option.active {
+            border-color: var(--accent-primary);
+            background: rgba(6, 214, 160, 0.15);
+        }
+
+        .layout-option i {
+            display: block;
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar - Simplified for quick card creation -->
+            <aside class="sidebar" id="sidebar">
+                <div class="toggle-sidebar" id="toggle-sidebar">
+                    <i class="fas fa-chevron-left"></i>
+                </div>
+                
+                <div class="panel-header">
+                    <div class="logo">
+                        <i class="fas fa-dragonfly"></i>
+                        <h1></h1>
+                    </div>
+                </div>
+
+                <div class="sidebar-content">
+                    <h3 style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-primary);">Create New Card</h3>
+                    
+                    <div class="form-group">
+                        <label for="element-title">Title</label>
+                        <input type="text" id="element-title" class="form-control" placeholder="Enter title...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="element-description">Description</label>
+                        <textarea id="element-description" class="form-control" placeholder="Describe your content..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Platform & Dimensions</label>
+                        <div class="platform-options">
+                            <div class="platform-option active" data-platform="instagram">
+                                <i class="fab fa-instagram"></i>
+                                <span>Instagram</span>
+                            </div>
+                            <div class="platform-option" data-platform="instagram-story">
+                                <i class="fab fa-instagram"></i>
+                                <span>IG Story</span>
+                            </div>
+                            <div class="platform-option" data-platform="tiktok">
+                                <i class="fab fa-tiktok"></i>
+                                <span>TikTok</span>
+                            </div>
+                            <div class="platform-option" data-platform="pinterest">
+                                <i class="fab fa-pinterest"></i>
+                                <span>Pinterest</span>
+                            </div>
+                            <div class="platform-option" data-platform="facebook">
+                                <i class="fab fa-facebook"></i>
+                                <span>Facebook</span>
+                            </div>
+                            <div class="platform-option" data-platform="twitter">
+                                <i class="fab fa-twitter"></i>
+                                <span>Twitter</span>
+                            </div>
+                            <div class="platform-option" data-platform="linkedin">
+                                <i class="fab fa-linkedin"></i>
+                                <span>LinkedIn</span>
+                            </div>
+                            <div class="platform-option" data-platform="youtube">
+                                <i class="fab fa-youtube"></i>
+                                <span>YouTube</span>
+                            </div>
+                            <div class="platform-option" data-platform="custom">
+                                <i class="fas fa-cog"></i>
+                                <span>Custom</span>
+                            </div>
+                        </div>
+                        
+                        <div class="custom-dimensions" id="custom-dimensions">
+                            <label>Custom Dimensions (px)</label>
+                            <div class="dimension-inputs">
+                                <input type="number" id="custom-width" class="form-control" placeholder="Width" value="1080">
+                                <input type="number" id="custom-height" class="form-control" placeholder="Height" value="1080">
+                            </div>
+                            
+                            <div class="form-group" style="margin-top: 0.5rem;">
+                                <label>Layout</label>
+                                <div class="layout-options">
+                                    <div class="layout-option active" data-layout="vertical">
+                                        <i class="fas fa-square"></i>
+                                        <span>Card</span>
+                                    </div>
+                                    <div class="layout-option" data-layout="horizontal">
+                                        <i class="fas fa-columns"></i>
+                                        <span>Horizontal</span>
+                                    </div>
+                                    <div class="layout-option" data-layout="image-only">
+                                        <i class="fas fa-image"></i>
+                                        <span>Image Only</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="add-element" style="width: 100%; margin-top: 0.8rem;">
+                        <i class="fas fa-plus"></i> Add to Moodboard
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <div class="main-content-area">
+                <!-- Moodboard View -->
+                <main class="moodboard-container" id="moodboard-view">
+                    <div class="view-controls">
+                        <div class="view-buttons">
+                            <button class="view-btn active" data-view="grid" title="Grid View">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button class="view-btn" data-view="stack" title="Stack View">
+                                <i class="fas fa-square"></i>
+                            </button>
+                            <button class="view-btn" data-view="list" title="List View">
+                                <i class="fas fa-list"></i>
+                            </button>
+                            <button class="view-btn" data-view="feed" title="Social Feed Preview">
+                                <i class="fas fa-stream"></i>
+                            </button>
+                            <button class="filter-btn" id="filter-toggle" title="Filter Cards">
+                                <i class="fas fa-filter"></i>
+                            </button>
+                            <button class="view-btn" id="projects-btn" title="Projects">
+                                <i class="fas fa-folder"></i>
+                            </button>
+                            <button class="view-btn" id="export-hub-btn" title="Export & Share">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filter Panel -->
+                    <div class="filter-panel" id="filter-panel">
+                        <div class="filter-controls">
+                            <div class="filter-group">
+                                <label class="filter-label">Platform</label>
+                                <select class="filter-select" id="platform-filter">
+                                    <option value="all">All Platforms</option>
+                                    <option value="instagram">Instagram</option>
+                                    <option value="instagram-story">IG Story</option>
+                                    <option value="tiktok">TikTok</option>
+                                    <option value="pinterest">Pinterest</option>
+                                    <option value="facebook">Facebook</option>
+                                    <option value="twitter">Twitter</option>
+                                    <option value="linkedin">LinkedIn</option>
+                                    <option value="youtube">YouTube</option>
+                                    <option value="custom">Custom</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label class="filter-label">Schedule</label>
+                                <select class="filter-select" id="schedule-filter">
+                                    <option value="all">All Posts</option>
+                                    <option value="scheduled">Scheduled</option>
+                                    <option value="unscheduled">Unscheduled</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label class="filter-label">Convert Platform</label>
+                                <select class="filter-select" id="convert-platform">
+                                    <option value="">Select Platform...</option>
+                                    <option value="instagram">Instagram</option>
+                                    <option value="instagram-story">IG Story</option>
+                                    <option value="tiktok">TikTok</option>
+                                    <option value="pinterest">Pinterest</option>
+                                    <option value="facebook">Facebook</option>
+                                    <option value="twitter">Twitter</option>
+                                    <option value="linkedin">LinkedIn</option>
+                                    <option value="youtube">YouTube</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="moodboard grid" id="moodboard">
+                        <div class="empty-state" id="empty-state">
+                            <i class="fas fa-dragonfly"></i>
+                            <h3>Your moodboard is empty</h3>
+                            <p>Start by adding your first campaign element</p>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Toggle Button -->
+    <div class="mobile-toggle" id="mobile-toggle">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <!-- Projects Overlay -->
+    <div class="overlay" id="projects-overlay">
+        <div class="overlay-content">
+            <div class="overlay-header">
+                <h2 style="font-size: 1.2rem;">Your Projects</h2>
+                <button class="overlay-close" id="projects-overlay-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="projects-grid" id="projects-grid">
+                <!-- Projects will be dynamically added here -->
+            </div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+                <button class="btn btn-primary" id="save-current-project" style="flex: 1;">
+                    <i class="fas fa-save"></i> Save Current as Project
+                </button>
+                <button class="btn btn-secondary" id="export-all-projects" style="flex: 1;">
+                    <i class="fas fa-file-export"></i> Export All Projects
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Overlay -->
+    <div class="overlay" id="export-overlay">
+        <div class="overlay-content">
+            <div class="overlay-header">
+                <h2 style="font-size: 1.2rem;">Export & Share</h2>
+                <button class="overlay-close" id="export-overlay-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="export-options">
+                <div class="export-option" id="export-pdf">
+                    <i class="fas fa-file-pdf"></i>
+                    <h3>Export as PDF</h3>
+                    <p>Current view as PDF document</p>
+                </div>
+                <div class="export-option" id="export-image">
+                    <i class="fas fa-file-image"></i>
+                    <h3>Export as Image</h3>
+                    <p>Current view as high-quality PNG</p>
+                </div>
+                <div class="export-option" id="share-campaign">
+                    <i class="fas fa-share-alt"></i>
+                    <h3>Share Campaign</h3>
+                    <p>Share your campaign with team members</p>
+                </div>
+                <div class="export-option" id="export-calendar">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h3>Export Calendar</h3>
+                    <p>Export scheduled posts to your calendar</p>
+                </div>
+                <div class="export-option" id="export-project">
+                    <i class="fas fa-project-diagram"></i>
+                    <h3>Export Project</h3>
+                    <p>Export current project as JSON</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Card Modal -->
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="font-size: 1rem;">Edit Card</h2>
+                <button class="modal-close" id="edit-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="form-group">
+                <label for="edit-title">Title</label>
+                <input type="text" id="edit-title" class="form-control">
+            </div>
+            
+            <div class="form-group">
+                <label for="edit-description">Description</label>
+                <textarea id="edit-description" class="form-control"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Platform & Dimensions</label>
+                <div class="platform-options">
+                    <div class="platform-option" data-platform="instagram">
+                        <i class="fab fa-instagram"></i>
+                        <span>Instagram</span>
+                    </div>
+                    <div class="platform-option" data-platform="instagram-story">
+                        <i class="fab fa-instagram"></i>
+                        <span>IG Story</span>
+                    </div>
+                    <div class="platform-option" data-platform="tiktok">
+                        <i class="fab fa-tiktok"></i>
+                        <span>TikTok</span>
+                    </div>
+                    <div class="platform-option" data-platform="pinterest">
+                        <i class="fab fa-pinterest"></i>
+                        <span>Pinterest</span>
+                    </div>
+                    <div class="platform-option" data-platform="facebook">
+                        <i class="fab fa-facebook"></i>
+                        <span>Facebook</span>
+                    </div>
+                    <div class="platform-option" data-platform="twitter">
+                        <i class="fab fa-twitter"></i>
+                        <span>Twitter</span>
+                    </div>
+                    <div class="platform-option" data-platform="linkedin">
+                        <i class="fab fa-linkedin"></i>
+                        <span>LinkedIn</span>
+                    </div>
+                    <div class="platform-option" data-platform="youtube">
+                        <i class="fab fa-youtube"></i>
+                        <span>YouTube</span>
+                    </div>
+                    <div class="platform-option" data-platform="custom">
+                        <i class="fas fa-cog"></i>
+                        <span>Custom</span>
+                    </div>
+                </div>
+                
+                <div class="custom-dimensions" id="edit-custom-dimensions">
+                    <label>Custom Dimensions (px)</label>
+                    <div class="dimension-inputs">
+                        <input type="number" id="edit-custom-width" class="form-control" placeholder="Width" value="1080">
+                        <input type="number" id="edit-custom-height" class="form-control" placeholder="Height" value="1080">
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 0.5rem;">
+                        <label>Layout</label>
+                        <div class="layout-options">
+                            <div class="layout-option active" data-layout="vertical">
+                                <i class="fas fa-square"></i>
+                                <span>Card</span>
+                            </div>
+                            <div class="layout-option" data-layout="horizontal">
+                                <i class="fas fa-columns"></i>
+                                <span>Horizontal</span>
+                            </div>
+                            <div class="layout-option" data-layout="image-only">
+                                <i class="fas fa-image"></i>
+                                <span>Image Only</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Add Image</label>
+                <div class="image-upload-options">
+                    <div class="image-upload-option" id="upload-image-option">
+                        <i class="fas fa-upload"></i>
+                        <div>Upload</div>
+                    </div>
+                    <div class="image-upload-option" id="url-image-option">
+                        <i class="fas fa-link"></i>
+                        <div>URL</div>
+                    </div>
+                    <div class="image-upload-option" id="unsplash-image-option">
+                        <i class="fas fa-search"></i>
+                        <div>Unsplash</div>
+                    </div>
+                </div>
+                
+                <!-- Image URL Input -->
+                <div class="url-input" id="url-input-section" style="display: none; margin-top: 0.8rem;">
+                    <input type="url" id="edit-image-url" class="form-control" placeholder="Enter image URL...">
+                    <button class="btn" id="load-edit-url">Load</button>
+                </div>
+                
+                <!-- Unsplash Search -->
+                <div class="unsplash-search" id="unsplash-search-section" style="display: none; margin-top: 0.8rem;">
+                    <input type="text" id="edit-unsplash-search" class="form-control" placeholder="Search Unsplash...">
+                    <button class="btn" id="edit-unsplash-search-btn" style="width: 100%; margin-top: 0.3rem;">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <div class="unsplash-results" id="edit-unsplash-results" style="margin-top: 0.5rem;">
+                        <!-- Unsplash images will appear here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scheduling Section -->
+            <div class="scheduling-section">
+                <div class="scheduling-toggle" id="edit-scheduling-toggle">
+                    <label>Schedule Post</label>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="scheduling-content" id="edit-scheduling-content">
+                    <div class="form-group">
+                        <label for="edit-schedule-date">Date</label>
+                        <input type="date" id="edit-schedule-date" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-schedule-time">Time</label>
+                        <input type="time" id="edit-schedule-time" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-notification-email">Notification Email</label>
+                        <input type="email" id="edit-notification-email" class="form-control" placeholder="your-email@example.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Notification Methods</label>
+                        <div class="notification-options">
+                            <label class="notification-option">
+                                <input type="checkbox" id="edit-browser-notifications">
+                                <span>Browser Notifications</span>
+                            </label>
+                            <label class="notification-option">
+                                <input type="checkbox" id="edit-email-notifications">
+                                <span>Email Notifications</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button class="btn btn-primary" id="save-edit" style="width: 100%; margin-top: 0.8rem;">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <button class="btn btn-secondary" id="duplicate-card" style="width: 100%; margin-top: 0.3rem;">
+                    <i class="fas fa-copy"></i> Duplicate Card
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Input for Image Upload -->
+    <input type="file" id="edit-file-input" accept="image/*" style="display: none;">
+
+    <script>
+    // Configuration
+    const UNSPLASH_ACCESS_KEY = 'your_unsplash_access_key_here';
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elements
+        const moodboard = document.getElementById('moodboard');
+        const emptyState = document.getElementById('empty-state');
+        const addElementBtn = document.getElementById('add-element');
+        const editModal = document.getElementById('edit-modal');
+        const editModalClose = document.getElementById('edit-modal-close');
+        const saveEditBtn = document.getElementById('save-edit');
+        const duplicateCardBtn = document.getElementById('duplicate-card');
+        const platformOptions = document.querySelectorAll('.platform-option');
+        const customDimensions = document.getElementById('custom-dimensions');
+        const editCustomDimensions = document.getElementById('edit-custom-dimensions');
+        const viewButtons = document.querySelectorAll('.view-btn');
+        const projectsBtn = document.getElementById('projects-btn');
+        const exportHubBtn = document.getElementById('export-hub-btn');
+        const moodboardView = document.getElementById('moodboard-view');
+        const projectsGrid = document.getElementById('projects-grid');
+        const toggleSidebar = document.getElementById('toggle-sidebar');
+        const sidebar = document.getElementById('sidebar');
+        const mobileToggle = document.getElementById('mobile-toggle');
+        const platformFilter = document.getElementById('platform-filter');
+        const scheduleFilter = document.getElementById('schedule-filter');
+        const convertPlatform = document.getElementById('convert-platform');
+        const projectsOverlay = document.getElementById('projects-overlay');
+        const projectsOverlayClose = document.getElementById('projects-overlay-close');
+        const exportOverlay = document.getElementById('export-overlay');
+        const exportOverlayClose = document.getElementById('export-overlay-close');
+        const saveCurrentProjectBtn = document.getElementById('save-current-project');
+        const exportAllProjectsBtn = document.getElementById('export-all-projects');
+        const layoutOptions = document.querySelectorAll('.layout-option');
+        const filterToggle = document.getElementById('filter-toggle');
+        const filterPanel = document.getElementById('filter-panel');
+
+        // Image upload options in modal
+        const uploadImageOption = document.getElementById('upload-image-option');
+        const urlImageOption = document.getElementById('url-image-option');
+        const unsplashImageOption = document.getElementById('unsplash-image-option');
+        const urlInputSection = document.getElementById('url-input-section');
+        const unsplashSearchSection = document.getElementById('unsplash-search-section');
+        const editFileInput = document.getElementById('edit-file-input');
+        const loadEditUrlBtn = document.getElementById('load-edit-url');
+        const editUnsplashSearchBtn = document.getElementById('edit-unsplash-search-btn');
+
+        // Export hub elements
+        const exportPdfBtn = document.getElementById('export-pdf');
+        const exportImageBtn = document.getElementById('export-image');
+        const shareCampaignBtn = document.getElementById('share-campaign');
+        const exportCalendarBtn = document.getElementById('export-calendar');
+        const exportProjectBtn = document.getElementById('export-project');
+
+        // State
+        let moodboardItems = JSON.parse(localStorage.getItem('dragonflyMoodboard')) || [];
+        let projects = JSON.parse(localStorage.getItem('dragonflyProjects')) || [];
+        let selectedPlatform = 'instagram';
+        let selectedLayout = 'vertical';
+        let currentView = 'grid';
+        let isSidebarCollapsed = false;
+        let isMobile = window.innerWidth <= 768;
+        let currentEditingItem = null;
+        let currentImageUploadMethod = null;
+        let imageLibrary = JSON.parse(localStorage.getItem('dragonflyImageLibrary')) || [];
+
+        // Drag & Drop State
+        let dragSrcElement = null;
+        let isDragging = false;
+        let touchStartY = 0;
+        let touchStartX = 0;
+
+        // Initialize
+        renderMoodboard();
+        setupEventListeners();
+        checkMobileView();
+        initializeScheduling();
+
+        // Function Definitions
+        function addMoodboardItem() {
+            const title = document.getElementById('element-title').value;
+            const description = document.getElementById('element-description').value;
+
+            if (!title || !description) {
+                showNotification('Please fill in title and description', 'error');
+                return;
+            }
+
+            let imageHeight = 200;
+            let imageWidth = 200;
+            if (selectedPlatform === 'custom') {
+                imageHeight = parseInt(document.getElementById('custom-height').value) || 200;
+                imageWidth = parseInt(document.getElementById('custom-width').value) || 200;
+            }
+
+            const newItem = {
+                id: Date.now(),
+                title: title,
+                description: description,
+                platform: selectedPlatform,
+                layout: selectedLayout,
+                image: null,
+                imageHeight: imageHeight,
+                imageWidth: imageWidth,
+                imageSize: 'cover',
+                scheduleDate: null,
+                scheduleTime: null,
+                notificationEmail: null,
+                browserNotifications: false,
+                emailNotifications: false,
+                timestamp: new Date().toISOString()
+            };
+
+            moodboardItems.push(newItem);
+            saveMoodboard();
+            renderMoodboard();
+
+            // Reset form
+            document.getElementById('element-title').value = '';
+            document.getElementById('element-description').value = '';
+
+            showNotification('Card added to moodboard!', 'success');
+            
+            if (isMobile) {
+                sidebar.classList.remove('active');
+            }
+        }
+
+        function renderMoodboard() {
+            moodboard.innerHTML = '';
+
+            // Apply filters
+            let filteredItems = [...moodboardItems];
+            
+            // Platform filter
+            if (platformFilter.value !== 'all') {
+                filteredItems = filteredItems.filter(item => item.platform === platformFilter.value);
+            }
+            
+            // Schedule filter
+            if (scheduleFilter.value === 'scheduled') {
+                filteredItems = filteredItems.filter(item => item.scheduleDate);
+            } else if (scheduleFilter.value === 'unscheduled') {
+                filteredItems = filteredItems.filter(item => !item.scheduleDate);
+            }
+
+            if (filteredItems.length === 0) {
+                moodboard.appendChild(emptyState);
+                return;
+            }
+
+            emptyState.remove();
+            filteredItems.forEach(item => {
+                const card = createMoodboardCard(item);
+                moodboard.appendChild(card);
+            });
+        }
+
+        function createMoodboardCard(item) {
+            const card = document.createElement('div');
+            card.className = `moodboard-card platform-${item.platform} card-layout-${item.layout}`;
+            card.dataset.id = item.id;
+
+            if (item.platform === 'custom' && item.imageHeight) {
+                card.style.setProperty('--custom-height', `${item.imageHeight}px`);
+            }
+
+            const platformIcons = {
+                instagram: 'fab fa-instagram',
+                'instagram-story': 'fab fa-instagram',
+                tiktok: 'fab fa-tiktok',
+                pinterest: 'fab fa-pinterest',
+                facebook: 'fab fa-facebook',
+                twitter: 'fab fa-twitter',
+                linkedin: 'fab fa-linkedin',
+                youtube: 'fab fa-youtube',
+                custom: 'fas fa-cog'
+            };
+
+            const platformNames = {
+                instagram: 'Instagram Post',
+                'instagram-story': 'IG Story',
+                tiktok: 'TikTok',
+                pinterest: 'Pinterest',
+                facebook: 'Facebook',
+                twitter: 'Twitter',
+                linkedin: 'LinkedIn',
+                youtube: 'YouTube',
+                custom: 'Custom'
+            };
+
+            let scheduleInfo = '';
+            let notificationBadges = '';
+            
+            if (item.scheduleDate) {
+                const date = new Date(item.scheduleDate);
+                const formattedDate = date.toLocaleDateString();
+                const time = item.scheduleTime || '';
+                scheduleInfo = `<div class="card-schedule"><i class="fas fa-calendar-alt"></i>Scheduled: ${formattedDate} ${time}</div>`;
+                
+                const badges = [];
+                if (item.browserNotifications) badges.push('Browser');
+                if (item.emailNotifications) badges.push('Email');
+                
+                if (badges.length > 0) {
+                    notificationBadges = `<div class="card-notification-badges">${badges.map(badge => `<div class="notification-badge"><i class="fas fa-bell"></i> ${badge}</div>`).join('')}</div>`;
+                }
+            }
+
+            // Different card structure for feed view
+            if (currentView === 'feed') {
+                card.innerHTML = `
+                    <div class="card-image" style="${item.platform === 'custom' ? `height: ${item.imageHeight}px` : ''}">
+                        ${item.image ? `<img src="${item.image}" alt="${item.title}" style="object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                        <div class="placeholder" style="${item.image ? 'display: none;' : ''}">
+                            <i class="fas fa-dragonfly"></i>
+                        </div>
+                    </div>
+                `;
+            } 
+            // List view structure
+            else if (currentView === 'list') {
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="drag-handle">
+                            <i class="fas fa-grip-vertical"></i>
+                        </div>
+                        <div class="card-platform">
+                            <i class="${platformIcons[item.platform]}"></i>
+                            <span>${platformNames[item.platform]}</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="card-action" onclick="event.stopPropagation(); editItem(${item.id})" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="card-action" onclick="event.stopPropagation(); duplicateItem(${item.id})" title="Duplicate"><i class="fas fa-copy"></i></button>
+                            <button class="card-action" onclick="event.stopPropagation(); deleteItem(${item.id})" title="Delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex: 1;">
+                        <div class="card-image" style="width: 80px; height: 80px; ${item.platform === 'custom' ? `height: ${item.imageHeight}px` : ''}">
+                            ${item.image ? `<img src="${item.image}" alt="${item.title}" style="object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                            <div class="placeholder" style="${item.image ? 'display: none;' : ''}">
+                                <i class="fas fa-dragonfly"></i>
+                            </div>
+                        </div>
+                        <div class="card-content" style="flex: 1;">
+                            <h3 class="card-title">${item.title}</h3>
+                            <p class="card-description">${item.description}</p>
+                            ${scheduleInfo}${notificationBadges}
+                        </div>
+                    </div>
+                `;
+            }
+            // Image-only layout
+            else if (item.layout === 'image-only') {
+                card.innerHTML = `
+                    <div class="card-image" style="${item.platform === 'custom' ? `height: ${item.imageHeight}px` : ''}">
+                        ${item.image ? `<img src="${item.image}" alt="${item.title}" style="object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                        <div class="placeholder" style="${item.image ? 'display: none;' : ''}">
+                            <i class="fas fa-dragonfly"></i>
+                        </div>
+                    </div>
+                `;
+            }
+            // Horizontal layout
+            else if (item.layout === 'horizontal') {
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="drag-handle">
+                            <i class="fas fa-grip-vertical"></i>
+                        </div>
+                        <div class="card-platform">
+                            <i class="${platformIcons[item.platform]}"></i>
+                            <span>${platformNames[item.platform]}</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="card-action" onclick="event.stopPropagation(); editItem(${item.id})" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="card-action" onclick="event.stopPropagation(); duplicateItem(${item.id})" title="Duplicate"><i class="fas fa-copy"></i></button>
+                            <button class="card-action" onclick="event.stopPropagation(); deleteItem(${item.id})" title="Delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-layout-horizontal">
+                        <div class="card-image" style="${item.platform === 'custom' ? `height: ${item.imageHeight}px` : ''}">
+                            ${item.image ? `<img src="${item.image}" alt="${item.title}" style="object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                            <div class="placeholder" style="${item.image ? 'display: none;' : ''}">
+                                <i class="fas fa-dragonfly"></i>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <h3 class="card-title">${item.title}</h3>
+                            <p class="card-description">${item.description}</p>
+                            ${scheduleInfo}${notificationBadges}
+                        </div>
+                    </div>
+                `;
+            }
+            // Default vertical layout
+            else {
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="drag-handle">
+                            <i class="fas fa-grip-vertical"></i>
+                        </div>
+                        <div class="card-platform">
+                            <i class="${platformIcons[item.platform]}"></i>
+                            <span>${platformNames[item.platform]}</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="card-action" onclick="event.stopPropagation(); editItem(${item.id})" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="card-action" onclick="event.stopPropagation(); duplicateItem(${item.id})" title="Duplicate"><i class="fas fa-copy"></i></button>
+                            <button class="card-action" onclick="event.stopPropagation(); deleteItem(${item.id})" title="Delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-image" style="${item.platform === 'custom' ? `height: ${item.imageHeight}px` : ''}">
+                        ${item.image ? `<img src="${item.image}" alt="${item.title}" style="object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                        <div class="placeholder" style="${item.image ? 'display: none;' : ''}">
+                            <i class="fas fa-dragonfly"></i>
+                            <p>No image</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">${item.title}</h3>
+                        <p class="card-description">${item.description}</p>
+                        ${scheduleInfo}${notificationBadges}
+                    </div>
+                `;
+            }
+
+            // Add click handler for editing (only on non-header areas)
+            const cardImage = card.querySelector('.card-image');
+            const cardContent = card.querySelector('.card-content');
+            
+            if (cardImage) {
+                cardImage.addEventListener('click', (e) => {
+                    if (!e.target.closest('.card-actions')) {
+                        editItem(item.id);
+                    }
+                });
+            }
+            
+            if (cardContent) {
+                cardContent.addEventListener('click', (e) => {
+                    if (!e.target.closest('.card-actions')) {
+                        editItem(item.id);
+                    }
+                });
+            }
+
+            // Set up drag and drop only on the drag handle
+            const dragHandle = card.querySelector('.drag-handle');
+            if (dragHandle) {
+                setupDragAndDrop(card, dragHandle);
+            }
+
+            return card;
+        }
+
+        function saveMoodboard() {
+            localStorage.setItem('dragonflyMoodboard', JSON.stringify(moodboardItems));
+        }
+
+        function saveImageLibrary() {
+            localStorage.setItem('dragonflyImageLibrary', JSON.stringify(imageLibrary));
+        }
+
+        function openEditModal(itemId) {
+            const item = moodboardItems.find(item => item.id === itemId);
+            if (!item) return;
+
+            currentEditingItem = item;
+
+            // Populate form with item data
+            document.getElementById('edit-title').value = item.title;
+            document.getElementById('edit-description').value = item.description;
+            document.getElementById('edit-schedule-date').value = item.scheduleDate || '';
+            document.getElementById('edit-schedule-time').value = item.scheduleTime || '';
+            document.getElementById('edit-notification-email').value = item.notificationEmail || '';
+            document.getElementById('edit-browser-notifications').checked = item.browserNotifications;
+            document.getElementById('edit-email-notifications').checked = item.emailNotifications;
+            document.getElementById('edit-custom-width').value = item.imageWidth || 1080;
+            document.getElementById('edit-custom-height').value = item.imageHeight || 1080;
+
+            // Set platform option
+            document.querySelectorAll('.platform-option').forEach(option => {
+                option.classList.remove('active');
+                if (option.dataset.platform === item.platform) {
+                    option.classList.add('active');
+                }
+            });
+
+            // Set layout option
+            document.querySelectorAll('.layout-option').forEach(option => {
+                option.classList.remove('active');
+                if (option.dataset.layout === item.layout) {
+                    option.classList.add('active');
+                }
+            });
+
+            // Show/hide custom dimensions
+            if (item.platform === 'custom') {
+                editCustomDimensions.classList.add('active');
+            } else {
+                editCustomDimensions.classList.remove('active');
+            }
+
+            // Reset image upload sections
+            urlInputSection.style.display = 'none';
+            unsplashSearchSection.style.display = 'none';
+            currentImageUploadMethod = null;
+
+            editModal.classList.add('active');
+        }
+
+        function saveEdit() {
+            if (!currentEditingItem) return;
+
+            const title = document.getElementById('edit-title').value;
+            const description = document.getElementById('edit-description').value;
+            const scheduleDate = document.getElementById('edit-schedule-date').value;
+            const scheduleTime = document.getElementById('edit-schedule-time').value;
+            const notificationEmail = document.getElementById('edit-notification-email').value;
+            const browserNotifications = document.getElementById('edit-browser-notifications').checked;
+            const emailNotifications = document.getElementById('edit-email-notifications').checked;
+
+            // Get selected platform
+            const selectedPlatformOption = document.querySelector('.platform-option.active');
+            const platform = selectedPlatformOption ? selectedPlatformOption.dataset.platform : 'instagram';
+            
+            // Get selected layout
+            const selectedLayoutOption = document.querySelector('.layout-option.active');
+            const layout = selectedLayoutOption ? selectedLayoutOption.dataset.layout : 'vertical';
+            
+            // Get custom dimensions if applicable
+            let imageHeight = currentEditingItem.imageHeight;
+            let imageWidth = currentEditingItem.imageWidth;
+            if (platform === 'custom') {
+                imageHeight = parseInt(document.getElementById('edit-custom-height').value) || 200;
+                imageWidth = parseInt(document.getElementById('edit-custom-width').value) || 200;
+            }
+
+            if (!title || !description) {
+                showNotification('Please fill in title and description', 'error');
+                return;
+            }
+
+            // Update the item
+            currentEditingItem.title = title;
+            currentEditingItem.description = description;
+            currentEditingItem.platform = platform;
+            currentEditingItem.layout = layout;
+            currentEditingItem.imageHeight = imageHeight;
+            currentEditingItem.imageWidth = imageWidth;
+            currentEditingItem.scheduleDate = scheduleDate;
+            currentEditingItem.scheduleTime = scheduleTime;
+            currentEditingItem.notificationEmail = notificationEmail;
+            currentEditingItem.browserNotifications = browserNotifications;
+            currentEditingItem.emailNotifications = emailNotifications;
+
+            // Schedule notifications if needed
+            if (scheduleDate && scheduleTime) {
+                schedulePostNotifications(currentEditingItem);
+            }
+
+            saveMoodboard();
+            renderMoodboard();
+            editModal.classList.remove('active');
+            showNotification('Card updated!', 'success');
+        }
+
+        function duplicateCard() {
+            if (!currentEditingItem) return;
+
+            const duplicatedItem = {
+                ...currentEditingItem,
+                id: Date.now(),
+                title: `${currentEditingItem.title} (Copy)`,
+                timestamp: new Date().toISOString()
+            };
+
+            moodboardItems.push(duplicatedItem);
+            saveMoodboard();
+            renderMoodboard();
+            editModal.classList.remove('active');
+            showNotification('Card duplicated!', 'success');
+        }
+
+        function setView(view) {
+            currentView = view;
+            moodboard.className = 'moodboard ' + view;
+            
+            // Update active view button
+            viewButtons.forEach(btn => {
+                if (btn.dataset.view) {
+                    btn.classList.toggle('active', btn.dataset.view === view);
+                }
+            });
+            
+            renderMoodboard();
+        }
+
+        function convertAllToPlatform(platform) {
+            if (!platform || platform === '') return;
+            
+            if (confirm(`Convert all cards to ${platform} platform?`)) {
+                moodboardItems.forEach(item => {
+                    item.platform = platform;
+                    // Reset dimensions for non-custom platforms
+                    if (platform !== 'custom') {
+                        item.imageHeight = getPlatformHeight(platform);
+                        item.imageWidth = getPlatformWidth(platform);
+                    }
+                });
+                
+                saveMoodboard();
+                renderMoodboard();
+                showNotification(`All cards converted to ${platform}`, 'success');
+                
+                // Reset the convert dropdown
+                convertPlatform.value = '';
+            }
+        }
+
+        function getPlatformHeight(platform) {
+            const heights = {
+                'instagram': 200,
+                'instagram-story': 350,
+                'tiktok': 400,
+                'pinterest': 300,
+                'facebook': 180,
+                'twitter': 180,
+                'linkedin': 170,
+                'youtube': 120,
+                'custom': 200
+            };
+            return heights[platform] || 200;
+        }
+
+        function getPlatformWidth(platform) {
+            const widths = {
+                'instagram': 200,
+                'instagram-story': 200,
+                'tiktok': 200,
+                'pinterest': 200,
+                'facebook': 200,
+                'twitter': 200,
+                'linkedin': 200,
+                'youtube': 200,
+                'custom': 200
+            };
+            return widths[platform] || 200;
+        }
+
+        function renderProjectsGrid() {
+            projectsGrid.innerHTML = '';
+            
+            if (projects.length === 0) {
+                projectsGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--text-secondary);">
+                        <i class="fas fa-folder-open" style="font-size: 2rem; margin-bottom: 0.8rem; opacity: 0.5;"></i>
+                        <h3>No projects yet</h3>
+                        <p>Save your current moodboard as a project to get started</p>
+                    </div>
+                `;
+                return;
+            }
+
+            projects.forEach(project => {
+                const projectCard = document.createElement('div');
+                projectCard.className = 'project-card';
+                projectCard.innerHTML = `
+                    <h3>${project.name}</h3>
+                    <p>${project.description || 'No description'}</p>
+                    <div class="project-meta">
+                        <span>${project.moodboardItems.length} cards</span>
+                        <span>${new Date(project.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <div class="card-actions" style="margin-top: 0.8rem; justify-content: space-between;">
+                        <div>
+                            <button class="card-action" onclick="loadProject(${project.id})" title="Load Project">
+                                <i class="fas fa-folder-open"></i>
+                            </button>
+                            <button class="card-action" onclick="deleteProject(${project.id})" title="Delete Project">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <div>
+                            <button class="card-action" onclick="exportProjectAsPDF(${project.id})" title="Export as PDF">
+                                <i class="fas fa-file-pdf"></i>
+                            </button>
+                            <button class="card-action" onclick="exportProjectAsImage(${project.id})" title="Export as Image">
+                                <i class="fas fa-file-image"></i>
+                            </button>
+                            <button class="card-action" onclick="shareProject(${project.id})" title="Share Project">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                projectsGrid.appendChild(projectCard);
+            });
+        }
+
+        function saveCurrentProject() {
+            const projectName = prompt('Enter project name:');
+            if (!projectName) return;
+
+            const projectDescription = prompt('Enter project description (optional):') || '';
+
+            const project = {
+                id: Date.now(),
+                name: projectName,
+                description: projectDescription,
+                moodboardItems: [...moodboardItems],
+                createdAt: new Date().toISOString()
+            };
+
+            projects.push(project);
+            localStorage.setItem('dragonflyProjects', JSON.stringify(projects));
+            renderProjectsGrid();
+            showNotification('Project saved successfully!', 'success');
+            projectsOverlay.classList.remove('active');
+        }
+
+        function exportProjectAsJSON(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (!project) {
+                showNotification('Project not found', 'error');
+                return;
+            }
+
+            const dataStr = JSON.stringify(project, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `project-${project.name.replace(/\s+/g, '-').toLowerCase()}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification(`Project "${project.name}" exported as JSON`, 'success');
+        }
+
+        function exportAllProjectsAsJSON() {
+            if (projects.length === 0) {
+                showNotification('No projects to export', 'error');
+                return;
+            }
+
+            const dataStr = JSON.stringify(projects, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = 'dragonfly-projects.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification(`All ${projects.length} projects exported`, 'success');
+        }
+
+        function shareProject(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (!project) {
+                showNotification('Project not found', 'error');
+                return;
+            }
+
+            const projectData = JSON.stringify(project);
+            const encodedData = btoa(projectData);
+            const shareUrl = `${window.location.origin}${window.location.pathname}#project=${encodedData}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: `Dragonfly Project: ${project.name}`,
+                    text: `Check out my Dragonfly project "${project.name}" with ${project.moodboardItems.length} cards`,
+                    url: shareUrl
+                });
+            } else {
+                navigator.clipboard.writeText(shareUrl)
+                    .then(() => showNotification('Project link copied to clipboard!', 'success'))
+                    .catch(() => showNotification('Failed to copy project link', 'error'));
+            }
+        }
+
+        function setupImageUploadMethod(method) {
+            // Hide all sections first
+            urlInputSection.style.display = 'none';
+            unsplashSearchSection.style.display = 'none';
+
+            currentImageUploadMethod = method;
+
+            switch (method) {
+                case 'upload':
+                    editFileInput.click();
+                    break;
+                case 'url':
+                    urlInputSection.style.display = 'flex';
+                    break;
+                case 'unsplash':
+                    unsplashSearchSection.style.display = 'block';
+                    break;
+            }
+        }
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (file && currentEditingItem) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    currentEditingItem.image = event.target.result;
+                    
+                    // Add to image library
+                    if (!imageLibrary.includes(event.target.result)) {
+                        imageLibrary.push(event.target.result);
+                        saveImageLibrary();
+                    }
+                    
+                    saveMoodboard();
+                    renderMoodboard();
+                    showNotification('Image uploaded successfully!', 'success');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function loadImageFromUrl() {
+            const url = document.getElementById('edit-image-url').value;
+            if (url && currentEditingItem) {
+                currentEditingItem.image = url;
+                
+                // Add to image library
+                if (!imageLibrary.includes(url)) {
+                    imageLibrary.push(url);
+                    saveImageLibrary();
+                }
+                
+                saveMoodboard();
+                renderMoodboard();
+                showNotification('Image URL loaded!', 'success');
+                urlInputSection.style.display = 'none';
+                document.getElementById('edit-image-url').value = '';
+            } else {
+                showNotification('Please enter a valid URL', 'error');
+            }
+        }
+
+        async function searchUnsplash() {
+            const query = document.getElementById('edit-unsplash-search').value;
+            if (!query) {
+                showNotification('Please enter a search term', 'error');
+                return;
+            }
+
+            if (!UNSPLASH_ACCESS_KEY || UNSPLASH_ACCESS_KEY === 'your_unsplash_access_key_here') {
+                showNotification('Please set your Unsplash API access key first', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=9&client_id=${UNSPLASH_ACCESS_KEY}`
+                );
+                const data = await response.json();
+                displayUnsplashResults(data.results);
+            } catch (error) {
+                console.error('Unsplash API error:', error);
+                showNotification('Error fetching images from Unsplash', 'error');
+            }
+        }
+
+        function displayUnsplashResults(images) {
+            const unsplashResults = document.getElementById('edit-unsplash-results');
+            unsplashResults.innerHTML = '';
+            
+            images.forEach(image => {
+                const imgElement = document.createElement('img');
+                imgElement.src = image.urls.small;
+                imgElement.alt = image.alt_description || 'Unsplash image';
+                imgElement.className = 'unsplash-image';
+                imgElement.addEventListener('click', () => {
+                    if (currentEditingItem) {
+                        currentEditingItem.image = image.urls.regular;
+                        
+                        // Add to image library
+                        if (!imageLibrary.includes(image.urls.regular)) {
+                            imageLibrary.push(image.urls.regular);
+                            saveImageLibrary();
+                        }
+                        
+                        saveMoodboard();
+                        renderMoodboard();
+                        showNotification('Image selected from Unsplash!', 'success');
+                        unsplashSearchSection.style.display = 'none';
+                        document.getElementById('edit-unsplash-search').value = '';
+                    }
+                });
+                unsplashResults.appendChild(imgElement);
+            });
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed; top: 20px; right: 20px;
+                background: ${type === 'error' ? 'var(--accent-secondary)' : 'var(--accent-primary)'};
+                color: white; padding: 0.5rem 1rem; border-radius: var(--border-radius-sm);
+                z-index: 10000; font-weight: 600; box-shadow: var(--shadow);
+                transform: translateX(100%); transition: var(--transition);
+                font-size: 0.75rem; backdrop-filter: var(--blur);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 3000);
+        }
+
+        function checkMobileView() {
+            isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+                sidebar.classList.remove('collapsed');
+                document.querySelector('.moodboard-container').classList.remove('expanded');
+            } else {
+                if (isSidebarCollapsed) {
+                    sidebar.classList.add('collapsed');
+                    document.querySelector('.moodboard-container').classList.add('expanded');
+                } else {
+                    sidebar.classList.remove('collapsed');
+                    document.querySelector('.moodboard-container').classList.remove('expanded');
+                }
+            }
+        }
+
+        function toggleSidebarView() {
+            isSidebarCollapsed = !isSidebarCollapsed;
+            sidebar.classList.toggle('collapsed');
+            document.querySelector('.moodboard-container').classList.toggle('expanded');
+            
+            const icon = toggleSidebar.querySelector('i');
+            if (isSidebarCollapsed) {
+                icon.classList.remove('fa-chevron-left');
+                icon.classList.add('fa-chevron-right');
+            } else {
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-left');
+            }
+        }
+
+        function toggleMobileSidebar() {
+            sidebar.classList.toggle('active');
+        }
+
+        function toggleFilterPanel() {
+            filterPanel.classList.toggle('active');
+            filterToggle.classList.toggle('active');
+        }
+
+        // Scheduling and Notification Functions
+        function initializeScheduling() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+            checkScheduledPosts();
+        }
+
+        function schedulePostNotifications(item) {
+            if (item.scheduleDate && item.scheduleTime) {
+                if (item.browserNotifications) {
+                    scheduleBrowserNotification(item);
+                }
+            }
+        }
+
+        function scheduleBrowserNotification(item) {
+            const scheduledDateTime = new Date(`${item.scheduleDate}T${item.scheduleTime}`);
+            const now = new Date();
+            const timeDiff = scheduledDateTime.getTime() - now.getTime();
+            
+            if (timeDiff > 0) {
+                setTimeout(() => {
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                        new Notification('Dragonfly Campaign Studio', {
+                            body: `Scheduled post "${item.title}" is due now!`,
+                            icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🦋</text></svg>',
+                            tag: `scheduled-${item.id}`
+                        });
+                    }
+                }, timeDiff);
+            }
+        }
+
+        function checkScheduledPosts() {
+            const now = new Date();
+            let notifiedItems = JSON.parse(localStorage.getItem('dragonflyNotifiedItems')) || [];
+            
+            moodboardItems.forEach(item => {
+                if (item.scheduleDate && item.scheduleTime && !notifiedItems.includes(item.id)) {
+                    const scheduledDateTime = new Date(`${item.scheduleDate}T${item.scheduleTime}`);
+                    const timeDiff = scheduledDateTime.getTime() - now.getTime();
+                    
+                    if (timeDiff > 0 && timeDiff <= 60000) {
+                        triggerScheduledNotification(item);
+                        notifiedItems.push(item.id);
+                        localStorage.setItem('dragonflyNotifiedItems', JSON.stringify(notifiedItems));
+                    }
+                }
+            });
+            
+            setTimeout(checkScheduledPosts, 30000);
+        }
+
+        function triggerScheduledNotification(item) {
+            if (item.browserNotifications && 'Notification' in window) {
+                if (Notification.permission === 'granted') {
+                    new Notification('Dragonfly Campaign Studio', {
+                        body: `Scheduled post "${item.title}" is due now!`,
+                        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🦋</text></svg>',
+                        tag: `scheduled-${item.id}`
+                    });
+                } else if (Notification.permission !== 'denied') {
+                    Notification.requestPermission();
+                }
+            }
+            
+            showNotification(`Scheduled post "${item.title}" is due now!`, 'success');
+        }
+
+        // Enhanced Export Functions - Now captures actual view layout
+        async function exportAsPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            // Cover page
+            doc.setFillColor(15, 23, 42);
+            doc.rect(0, 0, 210, 297, 'F');
+            doc.setTextColor(241, 245, 249);
+            doc.setFontSize(20);
+            doc.text('Campaign Moodboard', 105, 50, { align: 'center' });
+            doc.setFontSize(14);
+            doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 65, { align: 'center' });
+            doc.setFontSize(10);
+            doc.text(`Total cards: ${moodboardItems.length}`, 105, 80, { align: 'center' });
+            doc.text(`View: ${currentView.charAt(0).toUpperCase() + currentView.slice(1)}`, 105, 90, { align: 'center' });
+            
+            // Add content pages with images - preserving the current view layout
+            for (let i = 0; i < moodboardItems.length; i++) {
+                const item = moodboardItems[i];
+                if (i > 0) doc.addPage();
+                
+                doc.setFillColor(15, 23, 42);
+                doc.rect(0, 0, 210, 297, 'F');
+                doc.setTextColor(241, 245, 249);
+                
+                // Title
+                doc.setFontSize(16);
+                doc.text(item.title, 20, 30);
+                
+                // Description
+                doc.setFontSize(10);
+                const descriptionLines = doc.splitTextToSize(item.description, 170);
+                doc.text(descriptionLines, 20, 45);
+                
+                // Platform and schedule info
+                doc.setFontSize(8);
+                let currentY = 45 + (descriptionLines.length * 4) + 10;
+                doc.text(`Platform: ${item.platform}`, 20, currentY);
+                doc.text(`Layout: ${item.layout}`, 20, currentY + 6);
+                
+                if (item.scheduleDate) {
+                    currentY += 12;
+                    doc.text(`Scheduled: ${item.scheduleDate} ${item.scheduleTime || ''}`, 20, currentY);
+                }
+                
+                // Add image if available
+                if (item.image) {
+                    try {
+                        currentY += 12;
+                        // Add image caption
+                        doc.text('Image:', 20, currentY);
+                        currentY += 4;
+                        
+                        // Convert and add image (limited size for PDF)
+                        const img = new Image();
+                        img.crossOrigin = 'anonymous';
+                        img.src = item.image;
+                        
+                        await new Promise((resolve) => {
+                            img.onload = () => {
+                                const imgWidth = 70;
+                                const imgHeight = (img.height * imgWidth) / img.width;
+                                doc.addImage(img, 'JPEG', 20, currentY, imgWidth, Math.min(imgHeight, 80));
+                                resolve();
+                            };
+                            img.onerror = () => resolve();
+                        });
+                    } catch (error) {
+                        console.log('Could not add image to PDF:', error);
+                    }
+                }
+            }
+            
+            doc.save(`dragonfly-moodboard-${currentView}.pdf`);
+            showNotification(`PDF exported in ${currentView} view!`, 'success');
+        }
+
+        async function exportAsImage() {
+            try {
+                // Create export container that matches current view exactly
+                const exportContainer = document.createElement('div');
+                exportContainer.style.cssText = `
+                    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+                    padding: 30px; width: 100%; min-height: 100vh;
+                    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+                `;
+                
+                // Enhanced header section
+                const exportHeader = document.createElement('div');
+                exportHeader.style.cssText = 'text-align: center; margin-bottom: 30px;';
+                
+                const exportTitle = document.createElement('h1');
+                exportTitle.textContent = 'Campaign Moodboard';
+                exportTitle.style.cssText = 'color: #f1f5f9; font-size: 28px; margin-bottom: 8px; font-weight: 700;';
+                
+                const exportSubtitle = document.createElement('h2');
+                exportSubtitle.textContent = `Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`;
+                exportSubtitle.style.cssText = 'color: #94a3b8; font-size: 16px; margin-bottom: 12px;';
+                
+                const exportStats = document.createElement('div');
+                exportStats.style.cssText = 'color: #b5d78e; font-size: 14px;';
+                exportStats.textContent = `${moodboardItems.length} campaign elements • ${currentView.charAt(0).toUpperCase() + currentView.slice(1)} View`;
+                
+                exportHeader.appendChild(exportTitle);
+                exportHeader.appendChild(exportSubtitle);
+                exportHeader.appendChild(exportStats);
+                
+                // Moodboard content - preserving exact current view
+                const exportMoodboard = document.createElement('div');
+                exportMoodboard.className = `moodboard ${currentView}`;
+                exportMoodboard.style.cssText = `
+                    gap: 15px; padding: 15px; background: rgba(30, 41, 59, 0.8);
+                    border-radius: 12px; width: 100%; backdrop-filter: blur(20px);
+                `;
+                
+                // Apply current filters for export
+                let filteredItems = [...moodboardItems];
+                if (platformFilter.value !== 'all') {
+                    filteredItems = filteredItems.filter(item => item.platform === platformFilter.value);
+                }
+                if (scheduleFilter.value === 'scheduled') {
+                    filteredItems = filteredItems.filter(item => item.scheduleDate);
+                } else if (scheduleFilter.value === 'unscheduled') {
+                    filteredItems = filteredItems.filter(item => !item.scheduleDate);
+                }
+                
+                filteredItems.forEach(item => {
+                    const cardClone = createMoodboardCard(item);
+                    cardClone.style.cssText = 'width: 100%; margin: 0;';
+                    exportMoodboard.appendChild(cardClone);
+                });
+                
+                exportContainer.appendChild(exportHeader);
+                exportContainer.appendChild(exportMoodboard);
+                document.body.appendChild(exportContainer);
+                
+                const canvas = await html2canvas(exportContainer, {
+                    backgroundColor: '#0f172a',
+                    scale: 2,
+                    useCORS: true,
+                    width: exportContainer.scrollWidth,
+                    height: exportContainer.scrollHeight
+                });
+                
+                document.body.removeChild(exportContainer);
+                const link = document.createElement('a');
+                link.download = `dragonfly-moodboard-${currentView}.png`;
+                link.href = canvas.toDataURL('image/png', 1.0);
+                link.click();
+                
+                showNotification(`Image exported in ${currentView} view!`, 'success');
+            } catch (error) {
+                console.error('Image export error:', error);
+                showNotification('Error exporting image', 'error');
+            }
+        }
+
+        function shareCampaign() {
+            const text = `Check out my Dragonfly Campaign Moodboard with ${moodboardItems.length} elements in ${currentView} view!`;
+            const url = window.location.href;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Dragonfly Campaign',
+                    text: text,
+                    url: url
+                });
+            } else {
+                navigator.clipboard.writeText(`${text} ${url}`)
+                    .then(() => showNotification('Campaign link copied to clipboard!', 'success'))
+                    .catch(() => showNotification('Failed to copy link', 'error'));
+            }
+        }
+
+        function exportCalendarEvents() {
+            const scheduledItems = moodboardItems.filter(item => item.scheduleDate);
+            if (scheduledItems.length === 0) {
+                showNotification('No scheduled posts found', 'error');
+                return;
+            }
+
+            let icsContent = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Dragonfly Campaign Studio//EN'];
+
+            scheduledItems.forEach(item => {
+                const startTime = new Date(`${item.scheduleDate}T${item.scheduleTime || '12:00'}`);
+                const endTime = new Date(startTime.getTime() + 30 * 60000);
+                const timestamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+                
+                const event = [
+                    'BEGIN:VEVENT',
+                    `UID:${item.id}@dragonfly-campaign-studio`,
+                    `DTSTAMP:${timestamp}`,
+                    `DTSTART:${formatDateForICS(startTime)}`,
+                    `DTEND:${formatDateForICS(endTime)}`,
+                    `SUMMARY:Post: ${item.title}`,
+                    `DESCRIPTION:${item.description || 'Social media post'}`,
+                    'END:VEVENT'
+                ].join('\r\n');
+                
+                icsContent.push(event);
+            });
+
+            icsContent.push('END:VCALENDAR');
+            
+            const blob = new Blob([icsContent.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'scheduled-posts.ics';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification(`${scheduledItems.length} calendar events exported!`, 'success');
+        }
+
+        function formatDateForICS(date) {
+            return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        }
+
+        // Project Export Functions
+        function exportProjectAsPDF(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (!project) {
+                showNotification('Project not found', 'error');
+                return;
+            }
+            
+            // Temporarily save current moodboard
+            const currentMoodboard = [...moodboardItems];
+            
+            // Set project items as current for export
+            moodboardItems = [...project.moodboardItems];
+            
+            // Export
+            exportAsPDF();
+            
+            // Restore original moodboard
+            moodboardItems = currentMoodboard;
+        }
+
+        function exportProjectAsImage(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (!project) {
+                showNotification('Project not found', 'error');
+                return;
+            }
+            
+            const currentMoodboard = [...moodboardItems];
+            moodboardItems = [...project.moodboardItems];
+            exportAsImage();
+            moodboardItems = currentMoodboard;
+        }
+
+        // Helper function for platform stats
+        function getUniquePlatforms() {
+            const platforms = moodboardItems.map(item => item.platform);
+            return [...new Set(platforms)];
+        }
+
+        // Drag & Drop Functions - Updated to only work on drag handle
+        function setupDragAndDrop(card, dragHandle) {
+            // Mouse events for desktop
+            dragHandle.addEventListener('mousedown', (e) => handleDragStart(e, card));
+            dragHandle.addEventListener('dragstart', (e) => handleDragStart(e, card));
+            card.addEventListener('dragend', handleDragEnd);
+
+            // Touch events for mobile
+            dragHandle.addEventListener('touchstart', (e) => handleTouchStart(e, card), { passive: false });
+            dragHandle.addEventListener('touchmove', handleTouchMove, { passive: false });
+            dragHandle.addEventListener('touchend', handleTouchEnd);
+
+            // Drag events
+            card.addEventListener('dragover', handleDragOver);
+            card.addEventListener('dragenter', handleDragEnter);
+            card.addEventListener('dragleave', handleDragLeave);
+            card.addEventListener('drop', handleDrop);
+        }
+
+        // Touch event handlers for mobile
+        function handleTouchStart(e, card) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const touch = e.touches[0];
+            touchStartY = touch.clientY;
+            touchStartX = touch.clientX;
+            
+            card.style.transition = 'none';
+            card.style.zIndex = '1000';
+            card.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+            
+            isDragging = true;
+            dragSrcElement = card;
+            
+            // Add visual feedback
+            card.style.transform = 'scale(1.02) rotate(2deg)';
+        }
+
+        function handleTouchMove(e) {
+            if (!isDragging) return;
+            
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const touch = e.touches[0];
+            const card = dragSrcElement;
+            
+            if (card) {
+                const deltaY = touch.clientY - touchStartY;
+                const deltaX = touch.clientX - touchStartX;
+                
+                card.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(1.02) rotate(2deg)`;
+                
+                // Highlight drop zones
+                const elements = document.elementsFromPoint(touch.clientX, touch.clientY);
+                const moodboardCards = elements.filter(el => el.classList.contains('moodboard-card'));
+                
+                moodboardCards.forEach(otherCard => {
+                    if (otherCard !== card) {
+                        otherCard.style.border = '2px dashed var(--accent-primary)';
+                    }
+                });
+            }
+        }
+
+        function handleTouchEnd(e) {
+            if (!isDragging) return;
+            
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const card = dragSrcElement;
+            if (card) {
+                card.style.transform = '';
+                card.style.zIndex = '';
+                card.style.boxShadow = '';
+                card.style.transition = 'var(--transition)';
+                
+                // Find the drop target
+                const touch = e.changedTouches[0];
+                const elements = document.elementsFromPoint(touch.clientX, touch.clientY);
+                const dropTarget = elements.find(el => el.classList.contains('moodboard-card') && el !== card);
+                
+                if (dropTarget) {
+                    reorderCards(card, dropTarget);
+                }
+                
+                // Reset all card borders
+                document.querySelectorAll('.moodboard-card').forEach(c => {
+                    c.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                });
+            }
+            
+            isDragging = false;
+            dragSrcElement = null;
+        }
+
+        // Improved desktop drag handlers
+        function handleDragStart(e, card) {
+            // For mouse events
+            if (e.type === 'mousedown' && e.button !== 0) return; // Only left click
+            
+            dragSrcElement = card;
+            isDragging = true;
+            
+            card.style.opacity = '0.7';
+            card.style.zIndex = '1000';
+            card.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+            
+            // Set drag image to a custom transparent image
+            const dragImage = new Image();
+            dragImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+            e.dataTransfer.setDragImage(dragImage, 0, 0);
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragEnd(e) {
+            if (dragSrcElement) {
+                dragSrcElement.style.opacity = '';
+                dragSrcElement.style.zIndex = '';
+                dragSrcElement.style.boxShadow = '';
+            }
+            isDragging = false;
+            dragSrcElement = null;
+            
+            // Reset all borders
+            document.querySelectorAll('.moodboard-card').forEach(card => {
+                card.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+            });
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            if (this !== dragSrcElement) {
+                this.style.border = '2px dashed var(--accent-primary)';
+            }
+        }
+
+        function handleDragLeave(e) {
+            this.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+        }
+
+        function handleDrop(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            if (dragSrcElement && this !== dragSrcElement) {
+                reorderCards(dragSrcElement, this);
+            }
+            
+            this.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+            return false;
+        }
+
+        // Function to reorder cards in the array and DOM
+        function reorderCards(draggedCard, dropTarget) {
+            const draggedId = parseInt(draggedCard.dataset.id);
+            const targetId = parseInt(dropTarget.dataset.id);
+            
+            const draggedIndex = moodboardItems.findIndex(item => item.id === draggedId);
+            const targetIndex = moodboardItems.findIndex(item => item.id === targetId);
+            
+            if (draggedIndex !== -1 && targetIndex !== -1) {
+                // Remove dragged item
+                const [draggedItem] = moodboardItems.splice(draggedIndex, 1);
+                // Insert at target position
+                moodboardItems.splice(targetIndex, 0, draggedItem);
+                
+                saveMoodboard();
+                renderMoodboard();
+                showNotification('Cards reordered!', 'success');
+            }
+        }
+
+        function setupEventListeners() {
+            // Platform selection
+            platformOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    platformOptions.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    selectedPlatform = option.dataset.platform;
+                    
+                    if (selectedPlatform === 'custom') {
+                        customDimensions.classList.add('active');
+                    } else {
+                        customDimensions.classList.remove('active');
+                    }
+                });
+            });
+
+            // Layout selection
+            layoutOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    layoutOptions.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    selectedLayout = option.dataset.layout;
+                });
+            });
+
+            // Add element
+            addElementBtn.addEventListener('click', addMoodboardItem);
+
+            // View controls
+            viewButtons.forEach(button => {
+                if (button.dataset.view) {
+                    button.addEventListener('click', () => {
+                        setView(button.dataset.view);
+                    });
+                }
+            });
+
+            // Filter toggle
+            filterToggle.addEventListener('click', toggleFilterPanel);
+
+            // Overlay controls
+            projectsBtn.addEventListener('click', () => {
+                renderProjectsGrid();
+                projectsOverlay.classList.add('active');
+            });
+            
+            exportHubBtn.addEventListener('click', () => {
+                exportOverlay.classList.add('active');
+            });
+            
+            projectsOverlayClose.addEventListener('click', () => {
+                projectsOverlay.classList.remove('active');
+            });
+            
+            exportOverlayClose.addEventListener('click', () => {
+                exportOverlay.classList.remove('active');
+            });
+
+            // Edit modal
+            editModalClose.addEventListener('click', () => editModal.classList.remove('active'));
+            saveEditBtn.addEventListener('click', saveEdit);
+            duplicateCardBtn.addEventListener('click', duplicateCard);
+
+            // Image upload methods
+            uploadImageOption.addEventListener('click', () => setupImageUploadMethod('upload'));
+            urlImageOption.addEventListener('click', () => setupImageUploadMethod('url'));
+            unsplashImageOption.addEventListener('click', () => setupImageUploadMethod('unsplash'));
+
+            // File upload
+            editFileInput.addEventListener('change', handleImageUpload);
+
+            // Load image from URL
+            loadEditUrlBtn.addEventListener('click', loadImageFromUrl);
+
+            // Unsplash search
+            editUnsplashSearchBtn.addEventListener('click', searchUnsplash);
+
+            // Scheduling toggle in edit modal
+            document.getElementById('edit-scheduling-toggle').addEventListener('click', function() {
+                const content = document.getElementById('edit-scheduling-content');
+                const icon = this.querySelector('i');
+                content.classList.toggle('active');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+            });
+
+            // Export hub buttons
+            exportPdfBtn.addEventListener('click', exportAsPDF);
+            exportImageBtn.addEventListener('click', exportAsImage);
+            shareCampaignBtn.addEventListener('click', shareCampaign);
+            exportCalendarBtn.addEventListener('click', exportCalendarEvents);
+            exportProjectBtn.addEventListener('click', () => exportProjectAsJSON(Date.now()));
+
+            // Save current project
+            saveCurrentProjectBtn.addEventListener('click', saveCurrentProject);
+            exportAllProjectsBtn.addEventListener('click', exportAllProjectsAsJSON);
+
+            // Sidebar and mobile
+            toggleSidebar.addEventListener('click', toggleSidebarView);
+            mobileToggle.addEventListener('click', toggleMobileSidebar);
+            window.addEventListener('resize', checkMobileView);
+
+            // Filter controls
+            platformFilter.addEventListener('change', renderMoodboard);
+            scheduleFilter.addEventListener('change', renderMoodboard);
+            convertPlatform.addEventListener('change', function() {
+                convertAllToPlatform(this.value);
+            });
+
+            // Prevent default drag behavior on the entire moodboard
+            moodboard.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            
+            moodboard.addEventListener('drop', (e) => {
+                e.preventDefault();
+            });
+        }
+
+        // Global functions for card actions
+        window.editItem = function(id) {
+            openEditModal(id);
+        };
+
+        window.deleteItem = function(id) {
+            if (confirm('Are you sure you want to delete this card?')) {
+                moodboardItems = moodboardItems.filter(item => item.id !== id);
+                saveMoodboard();
+                renderMoodboard();
+                showNotification('Card deleted', 'success');
+            }
+        };
+
+        window.duplicateItem = function(id) {
+            const item = moodboardItems.find(item => item.id === id);
+            if (item) {
+                const duplicatedItem = {
+                    ...item,
+                    id: Date.now(),
+                    title: `${item.title} (Copy)`,
+                    timestamp: new Date().toISOString()
+                };
+                moodboardItems.push(duplicatedItem);
+                saveMoodboard();
+                renderMoodboard();
+                showNotification('Card duplicated!', 'success');
+            }
+        };
+
+        window.loadProject = function(id) {
+            const project = projects.find(p => p.id === id);
+            if (project) {
+                moodboardItems = [...project.moodboardItems];
+                saveMoodboard();
+                renderMoodboard();
+                projectsOverlay.classList.remove('active');
+                showNotification(`Project "${project.name}" loaded`, 'success');
+            }
+        };
+
+        window.deleteProject = function(id) {
+            if (confirm('Are you sure you want to delete this project?')) {
+                projects = projects.filter(p => p.id !== id);
+                localStorage.setItem('dragonflyProjects', JSON.stringify(projects));
+                renderProjectsGrid();
+                showNotification('Project deleted', 'success');
+            }
+        };
+
+        window.exportProjectAsPDF = exportProjectAsPDF;
+        window.exportProjectAsImage = exportProjectAsImage;
+        window.shareProject = shareProject;
+        window.exportProjectAsJSON = exportProjectAsJSON;
+    });
+</script>
+</body>
+</html>
