@@ -3,933 +3,589 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ray of Light — Systems for Creative Businesses</title>
+    <title>Ray of Light — Digital Systems & Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* Design tokens inspired by provided CSS for consistency and breathability */
+        :root {
+            --color-bg: #0a0a0a;
+            --color-surface: #121212;
+            --color-primary: #f0f0f0;
+            --color-gray: #888;
+            --color-gray-dark: #aaa;
+            --color-border: #2a2a2a;
+            --color-accent: #D0A380;
+            --font-serif: 'Cormorant Garamond', 'Georgia', serif;
+            --font-sans: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --transition-base: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            background: #0A0E17;
-            color: #ffffff;
-            font-family: 'DM Sans', sans-serif;
-            line-height: 1.5;
+            background: var(--color-bg);
+            color: var(--color-primary);
+            font-family: var(--font-sans);
+            line-height: 1.6;
             min-height: 100vh;
-            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
         .page {
-            max-width: 1280px;
+            max-width: 900px;
             margin: 0 auto;
-            background: rgba(10, 14, 23, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(208, 175, 143, 0.15);
-            border-radius: 24px;
-            padding: 40px;
-            position: relative;
-            z-index: 2;
+            padding: 80px 24px;
         }
 
-        .bg-gradient {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 20% 30%, rgba(111, 105, 194, 0.2) 0%, transparent 40%),
-                        radial-gradient(circle at 80% 70%, rgba(208, 175, 143, 0.15) 0%, transparent 40%);
-            z-index: 1;
-            pointer-events: none;
-        }
-
+        /* Navigation */
         .nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 60px;
-            position: relative;
+            margin-bottom: 120px;
         }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 600;
-            font-size: 18px;
-            letter-spacing: -0.02em;
-        }
-
-        .logo img {
-            width: 40px;
+        .logo-img {
             height: 40px;
-            border-radius: 8px;
-            object-fit: cover;
+            width: auto;
+            display: block;
         }
 
-        .nav-links {
-            display: flex;
-            gap: 40px;
-        }
-
-        .nav-links a {
-            color: #A0A0A0;
+        .nav-link {
+            color: var(--color-gray);
             text-decoration: none;
-            font-size: 15px;
+            font-size: 14px;
+            font-weight: 400;
             transition: color 0.2s;
         }
 
-        .nav-links a:hover {
-            color: #D0AF8F;
-        }
+        .nav-link:hover { color: var(--color-accent); }
 
-        .mobile-menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .mobile-menu {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10, 14, 23, 0.98);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            padding: 80px 20px 20px;
-            flex-direction: column;
-        }
-
-        .mobile-menu.active {
-            display: flex;
-        }
-
-        .mobile-menu-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: none;
-            border: none;
-            color: #D0AF8F;
-            font-size: 32px;
-            cursor: pointer;
-        }
-
-        .mobile-menu a {
-            color: #ffffff;
-            text-decoration: none;
-            padding: 20px;
-            font-size: 24px;
-            border-bottom: 1px solid rgba(208, 175, 143, 0.2);
+        /* Hero */
+        .hero {
             text-align: center;
+            margin-bottom: 100px;
         }
 
-        .mobile-menu a:last-child {
-            border-bottom: none;
-        }
-
-        .core {
-            max-width: 900px;
-            margin: 0 auto 60px;
-            text-align: center;
-        }
-
-        .core h1 {
-            font-size: 48px;
-            font-weight: 500;
+        .hero h1 {
+            font-family: var(--font-serif);
+            font-size: 3.5rem;
+            font-weight: 400;
             line-height: 1.2;
-            margin-bottom: 20px;
-            color: #ffffff;
+            margin-bottom: 24px;
             letter-spacing: -0.02em;
         }
 
-        .core h1 span {
-            color: #D0AF8F;
-            border-bottom: 2px solid rgba(208, 175, 143, 0.3);
+        .hero h1 em {
+            color: var(--color-accent);
+            font-style: normal;
         }
 
-        .core p {
+        .hero p {
             font-size: 18px;
-            color: #A0A0A0;
+            color: var(--color-gray-dark);
             max-width: 600px;
-            margin: 0 auto 30px;
+            margin: 0 auto;
+            font-weight: 300;
         }
 
-        .philosophy-statement {
-            max-width: 700px;
-            margin: 30px auto 0;
-            padding: 16px 24px;
-            background: rgba(208, 175, 143, 0.03);
-            border-radius: 40px;
-            border: 1px solid rgba(208, 175, 143, 0.15);
-            font-size: 16px;
-            color: #D0AF8F;
-            font-weight: 400;
+        /* Portfolio Section */
+        .portfolio-section {
+            margin-bottom: 100px;
+            padding: 48px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
         }
 
-        .portfolio-strip {
-            margin: 40px 0 60px;
-            padding: 20px 24px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(208, 175, 143, 0.15);
-            border-radius: 16px;
-        }
-
-        .portfolio-title {
-            color: #888;
-            font-size: 13px;
+        .section-label {
+            text-align: center;
+            color: var(--color-gray);
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 16px;
+            letter-spacing: 2px;
+            margin-bottom: 48px;
         }
 
         .portfolio-grid {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 40px;
-            flex-wrap: wrap;
         }
 
         .portfolio-item {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
+            flex-direction: column;
+            gap: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .portfolio-item:hover {
+            transform: translateY(-2px);
         }
 
         .portfolio-item a {
-            color: #ffffff;
+            color: var(--color-primary);
             text-decoration: none;
-            font-size: 15px;
-            border-bottom: 1px solid rgba(208, 175, 143, 0.3);
-            padding-bottom: 2px;
-        }
-
-        .portfolio-item a:hover {
-            border-bottom-color: #D0AF8F;
-        }
-
-        .portfolio-badge {
-            background: rgba(208, 175, 143, 0.1);
-            padding: 2px 8px;
-            font-size: 11px;
-            color: #D0AF8F;
-            border-radius: 12px;
-            border: 1px solid rgba(208, 175, 143, 0.2);
-            white-space: nowrap;
-        }
-
-        .category {
-            margin: 60px 0 24px;
-            font-size: 20px;
-            font-weight: 500;
-            color: #D0AF8F;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border-bottom: 1px solid rgba(208, 175, 143, 0.2);
-            padding-bottom: 12px;
-        }
-
-        .category:first-of-type {
-            margin-top: 20px;
-        }
-
-        .systems-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-            gap: 20px;
-        }
-
-        .system-card {
-            border: 1px solid rgba(208, 175, 143, 0.15);
-            border-radius: 16px;
-            padding: 24px;
-            background: rgba(10, 14, 23, 0.6);
-            transition: all 0.2s ease;
-        }
-
-        .system-card:hover {
-            border-color: #D0AF8F;
-            transform: translateY(-2px);
-        }
-
-        .system-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
+            font-family: var(--font-serif);
+            font-size: 22px;
+            font-weight: 400;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s, color 0.2s;
+            width: fit-content;
+            display: inline-flex;
             align-items: center;
+            gap: 8px;
         }
 
-        .system-title span {
-            color: #D0AF8F;
-            font-size: 14px;
-            background: rgba(208, 175, 143, 0.1);
-            padding: 4px 8px;
-            border-radius: 20px;
-        }
-
-        .system-description {
-            font-size: 14px;
-            color: #A0A0A0;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .system-includes {
-            font-size: 13px;
-            color: #888;
-            margin-bottom: 20px;
-            padding: 12px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 8px;
-            border-left: 0px solid #D0AF8F;
-        }
-
-        .system-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(208, 175, 143, 0.1);
-        }
-
-        .system-price {
-            color: #ffffff;
-            font-weight: 600;
+        .portfolio-item a::before {
+            content: "→";
+            color: var(--color-accent);
             font-size: 16px;
+            transition: transform 0.2s;
         }
 
-        .request-btn {
-            padding: 10px 20px;
-            background: none;
-            border: 2px solid #c09f7f;
-            color: inherit;
-            font-size: 14px;
-            font-weight: 600;
-            border-radius: 8px;
+        .portfolio-item a:hover { 
+            color: var(--color-accent); 
+            border-bottom-color: var(--color-accent); 
+        }
+
+        .portfolio-item a:hover::before {
+            transform: translateX(4px);
+        }
+
+        /* Accordion Offerings */
+        .offerings { margin-bottom: 100px; }
+        
+        .accordion-item {
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .accordion-item:first-of-type {
+            border-top: 1px solid var(--color-border);
+        }
+
+        .accordion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 32px 0;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: opacity 0.2s;
         }
 
-        .request-btn:hover {
-            background: #c09f7f;
-            transform: translateY(-2px);
+        .accordion-header:hover { opacity: 0.8; }
+
+        .accordion-title {
+            font-family: var(--font-serif);
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--color-primary);
         }
 
-        .results {
-            margin: 80px 0;
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-            margin-top: 24px;
-        }
-
-        .result-card {
-            border: 1px solid rgba(208, 175, 143, 0.15);
-            border-radius: 16px;
-            padding: 32px;
-            background: rgba(10, 14, 23, 0.6);
-        }
-
-        .quote-text {
-            font-size: 16px;
-            line-height: 1.6;
-            color: #ffffff;
-            margin-bottom: 20px;
-            font-style: italic;
-        }
-
-        .quote-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #888;
+        .accordion-meta {
             font-size: 14px;
-            flex-wrap: wrap;
-            gap: 12px;
+            color: var(--color-gray);
+            display: flex;
+            align-items: center;
+            gap: 24px;
         }
 
-        .quote-company {
-            color: #D0AF8F;
+        .accordion-price {
+            color: var(--color-primary);
             font-weight: 500;
         }
 
-        .quote-metric {
-            background: rgba(208, 175, 143, 0.1);
-            padding: 4px 12px;
-            border-radius: 20px;
-            color: #ffffff;
-            font-size: 13px;
+        .accordion-icon {
+            color: var(--color-accent);
+            transition: transform 0.3s ease;
+            font-size: 12px;
         }
 
+        .accordion-item.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+        }
+
+        .accordion-item.active .accordion-content {
+            max-height: 500px;
+            padding-bottom: 32px;
+        }
+
+        .accordion-inner {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .accordion-inner p {
+            color: var(--color-gray-dark);
+            font-size: 15px;
+            margin-bottom: 24px;
+            font-weight: 300;
+        }
+
+        .feature-list {
+            list-style: none;
+            display: inline-block;
+            text-align: left;
+        }
+
+        .feature-list li {
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--color-gray);
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--color-accent);
+        }
+
+        /* Profile / Philosophy */
         .profile {
-            margin: 60px 0;
+            margin-bottom: 80px;
             display: flex;
-            gap: 32px;
+            gap: 40px;
             align-items: center;
-            padding: 32px;
-            background: rgba(208, 175, 143, 0.03);
-            border-radius: 16px;
-            border: 1px solid rgba(208, 175, 143, 0.1);
+            padding: 40px;
+            background: var(--color-surface);
+            border-radius: 4px;
+            border: 1px solid var(--color-border);
         }
 
-        .profile img {
+        .profile-img {
             width: 80px;
             height: 80px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #D0AF8F;
+            border: 1px solid var(--color-accent);
             flex-shrink: 0;
         }
 
-        .profile-content p {
-            color: #A0A0A0;
-            line-height: 1.7;
+        .profile-text p {
+            color: var(--color-gray-dark);
             font-size: 15px;
+            font-weight: 300;
         }
 
-        .profile-content strong {
-            color: #D0AF8F;
-        }
-
-        .faq-section {
-            margin: 60px 0;
-        }
-
-        .faq-item {
-            border-bottom: 1px solid rgba(208, 175, 143, 0.1);
-            padding: 20px 0;
-        }
-
-        .faq-question {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            color: #ffffff;
+        .profile-text strong {
+            color: var(--color-primary);
             font-weight: 500;
-            user-select: none;
         }
 
-        .faq-question i {
-            color: #D0AF8F;
-            transition: transform 0.3s ease;
+        /* CTA */
+        .cta-section {
+            text-align: center;
+            padding: 80px 20px;
+            border-top: 1px solid var(--color-border);
         }
 
-        .faq-question.active i {
-            transform: rotate(180deg);
+        .cta-section h2 {
+            font-family: var(--font-serif);
+            font-size: 32px;
+            font-weight: 400;
+            margin-bottom: 16px;
         }
 
-        .faq-answer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-            color: #A0A0A0;
-            font-size: 14px;
-            line-height: 1.6;
+        .cta-section p {
+            color: var(--color-gray);
+            margin-bottom: 40px;
+            font-weight: 300;
         }
 
-        .faq-answer.active {
-            max-height: 300px;
-            margin-top: 16px;
-        }
-
-        .guidance-mini {
-            background: rgba(208, 175, 143, 0.05);
-            padding: 16px 20px;
-            margin-bottom: 24px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .guidance-mini p {
-            color: #ffffff;
-            font-size: 15px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .guidance-mini i {
-            color: #D0AF8F;
-        }
-
-        .guidance-mini-btn {
-            background: none;
-            border: 1px solid #D0AF8F;
-            color: #D0AF8F;
-            padding: 8px 20px;
-            border-radius: 8px;
+        .cta-btn {
+            background: transparent;
+            color: var(--color-primary);
+            padding: 16px 48px;
+            border: 1px solid var(--color-primary);
+            border-radius: 2px;
             text-decoration: none;
             font-weight: 500;
-            transition: all 0.2s;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
             cursor: pointer;
+            transition: all 0.3s ease;
             display: inline-block;
         }
 
-        .guidance-mini-btn:hover {
-            background: #D0AF8F;
-            color: #0A0E17;
+        .cta-btn:hover {
+            background: var(--color-primary);
+            color: var(--color-bg);
         }
 
-        .form-section {
-            margin: 60px 0 48px;
-            border: 1px solid rgba(208, 175, 143, 0.15);
-            border-radius: 16px;
-            padding: 32px;
-            background: rgba(10, 14, 23, 0.6);
+        /* Slide-out Panel (Receipt Style) */
+        .panel-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
         }
 
-        .form-section.hidden {
-            display: none;
+        .panel-overlay.active { 
+            opacity: 1; 
+            pointer-events: auto; 
         }
 
-        .selected-package {
-            background: rgba(208, 175, 143, 0.05);
-            padding: 16px 24px;
-            margin-bottom: 24px;
-            border-left: 3px solid #D0AF8F;
-            border-radius: 8px;
+        .project-panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            background: var(--color-surface);
+            color: var(--color-primary);
+            z-index: 1001;
+            overflow-y: auto;
+            padding: 48px 40px;
+            transition: right 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .project-panel.active { right: 0; }
+
+        .panel-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
+            margin-bottom: 48px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--color-border);
         }
 
-        .next-steps-notice {
-            background: rgba(0,0,0,0.3);
-            padding: 16px 20px;
-            border-radius: 8px;
-            margin-bottom: 24px;
-            border-left: 3px solid #D0AF8F;
+        .panel-title {
+            font-family: var(--font-serif);
+            font-size: 24px;
+            font-weight: 500;
         }
 
-        .next-steps-notice p {
-            color: #ffffff;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .close-panel {
+            background: none;
+            border: none;
+            color: var(--color-gray);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s;
         }
 
-        .next-steps-notice i {
-            color: #D0AF8F;
-        }
+        .close-panel:hover { color: var(--color-primary); }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
+        /* Receipt Form */
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 32px;
         }
 
         .form-label {
             display: block;
-            color: #A0A0A0;
-            font-size: 13px;
-            margin-bottom: 6px;
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            color: var(--color-gray);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
         }
 
         .form-input, .form-textarea {
             width: 100%;
-            padding: 12px 16px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(208, 175, 143, 0.2);
-            border-radius: 8px;
-            color: #ffffff;
-            font-size: 15px;
-            font-family: 'DM Sans', sans-serif;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--color-border);
+            padding: 12px 0;
+            color: var(--color-primary);
+            font-family: var(--font-sans);
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
         }
 
         .form-input:focus, .form-textarea:focus {
-            outline: none;
-            border-color: #D0AF8F;
+            border-bottom-color: var(--color-accent);
         }
 
-        .form-submit {
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .submit-btn {
             width: 100%;
-            padding: 16px;
-            background: #D0AF8F;
+            background: var(--color-primary);
+            color: var(--color-bg);
             border: none;
-            color: #0A0E17;
-            font-size: 16px;
+            padding: 16px;
+            font-size: 14px;
             font-weight: 600;
-            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
             margin-top: 16px;
-            transition: all 0.2s;
+            transition: background 0.2s;
         }
 
-        .form-submit:hover {
-            background: #c09f7f;
-            transform: translateY(-2px);
+        .submit-btn:hover {
+            background: var(--color-accent);
         }
 
-        .form-message {
-            margin-top: 16px;
-            padding: 16px;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .form-message.success {
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid rgba(0, 255, 136, 0.2);
-            color: #00cc88;
-        }
-
-        .form-message.error {
-            background: rgba(255, 68, 68, 0.1);
-            border: 1px solid rgba(255, 68, 68, 0.2);
-            color: #ff6666;
-        }
-
-        .footer {
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(208, 175, 143, 0.15);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            color: #666;
-            font-size: 13px;
-        }
-
-        .footer span {
-            color: #D0AF8F;
-        }
-
-        .footer a {
-            color: #888;
-            text-decoration: none;
-            margin-left: 24px;
-        }
-
-        .footer a:hover {
-            color: #D0AF8F;
-        }
-
+        /* WhatsApp Float */
         .whatsapp-float {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: 32px;
+            right: 32px;
             background: #25D366;
-            width: 60px;
-            height: 60px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 30px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
-            z-index: 100;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 999;
             text-decoration: none;
+            transition: transform 0.2s;
         }
 
-        .whatsapp-float:hover {
-            transform: scale(1.1);
-        }
+        .whatsapp-float:hover { transform: scale(1.05); }
 
-        @media (max-width: 700px) {
-            .page { padding: 20px; }
-            .core h1 { font-size: 32px; }
-            .nav-links { display: none; }
-            .mobile-menu-toggle { display: block !important; }
-            .portfolio-grid { flex-direction: column; gap: 16px; }
-            .portfolio-item { flex-wrap: wrap; }
-            .systems-grid { grid-template-columns: 1fr; }
-            .results-grid { grid-template-columns: 1fr; }
-            .profile { flex-direction: column; text-align: center; }
-            .guidance-mini { flex-direction: column; text-align: center; }
-            .guidance-mini-btn { width: 100%; text-align: center; }
-            .form-row { grid-template-columns: 1fr; }
-            .footer { flex-direction: column; text-align: center; }
-            .footer a { margin: 0 12px; }
-            .whatsapp-float { bottom: 20px; right: 20px; width: 50px; height: 50px; font-size: 25px; }
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page { padding: 40px 20px; }
+            .nav { margin-bottom: 60px; }
+            .logo-img { height: 32px; }
+            .hero h1 { font-size: 2.5rem; }
+            .hero { margin-bottom: 60px; }
+            .portfolio-section { padding: 32px 24px; margin-bottom: 60px; }
+            .portfolio-grid { gap: 32px; }
+            .accordion-title { font-size: 20px; }
+            .accordion-meta { gap: 12px; flex-direction: column; align-items: flex-end; }
+            .profile { flex-direction: column; text-align: center; padding: 24px; }
+            .project-panel { padding: 32px 24px; }
         }
     </style>
 </head>
 <body>
-    <div class="bg-gradient"></div>
-    
+
     <div class="page">
-        <!-- Navigation with mobile menu -->
-        <div class="nav">
-            <div class="logo">
-                <img src="https://giddycloth.s6-tastewp.com/wp-content/uploads/2025/10/O.-Ibrahim-1-scaled.jpg" alt="Ray of Light">
-                RAY OF LIGHT
-            </div>
-            <div class="nav-links">
-                <a href="#systems">Systems</a>
-                <a href="#results">Results</a>
-                <a href="#contact">Contact</a>
-            </div>
-            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        <!-- Nav -->
+        <nav class="nav">
+            <img src="https://z-cdn-media.chatglm.cn/files/33457a09-9e1d-46c0-af36-a0a74caf75b5.png?auth_key=1887176115-b0bf5e875b86469784f212462648f1f6-0-f167e48a65c7079a9c602a5667af6ea7" alt="Ray of Light" class="logo-img">
+            <a href="#contact" class="nav-link">Contact</a>
+        </nav>
+
+        <!-- Hero -->
+        <div class="hero">
+            <h1>From simple websites to <em>complete business systems</em>.</h1>
+            <p>Whether you need a clean digital presence to establish credibility, or a custom operating system to automate your workflow, we build tools that fit how you actually work.</p>
         </div>
 
-        <!-- Mobile menu overlay -->
-        <div class="mobile-menu" id="mobileMenu">
-            <button class="mobile-menu-close" onclick="toggleMobileMenu()">×</button>
-            <a href="#systems" onclick="toggleMobileMenu()">Systems</a>
-            <a href="#results" onclick="toggleMobileMenu()">Results</a>
-            <a href="#contact" onclick="toggleMobileMenu()">Contact</a>
-        </div>
-
-        <!-- Core message -->
-        <div class="core">
-            <h1>You don't need a website.<br>You need a <span>system</span>.</h1>
-            <p>Custom digital tools that turn creative chaos into sustainable revenue.</p>
-            <div class="philosophy-statement">
-                <strong>Websites are pages.</strong> Systems are businesses. One you visit. One you run on.
-            </div>
-        </div>
-
-        <!-- Portfolio strip -->
-        <div class="portfolio-strip">
-            <div class="portfolio-title">Live projects</div>
+        <!-- Portfolio Grid -->
+        <div class="portfolio-section">
+            <div class="section-label">Selected Live Work</div>
             <div class="portfolio-grid">
                 <div class="portfolio-item">
-                    <span>→</span>
-                    <a href="https://butterflyeffect.ng" target="_blank">butterflyeffect.ng</a>
-                    <span class="portfolio-badge">Event platform</span>
+                    <a href="https://princeways.netlify.app" target="_blank" rel="noopener noreferrer">princeways.netlify.app</a>
                 </div>
                 <div class="portfolio-item">
-                    <span>→</span>
-                    <a href="https://mezer.ng" target="_blank">mezer.ng</a>
-                    <span class="portfolio-badge">E-commerce</span>
+                    <a href="https://uloishome.netlify.app" target="_blank" rel="noopener noreferrer">uloishome.netlify.app</a>
                 </div>
                 <div class="portfolio-item">
-                    <span>→</span>
-                    <a href="https://ibrahimodey.com" target="_blank">ibrahimodey.com</a>
-                    <span class="portfolio-badge">Portfolio</span>
+                    <a href="https://dragonflyapp.netlify.app" target="_blank" rel="noopener noreferrer">dragonflyapp.netlify.app</a>
                 </div>
                 <div class="portfolio-item">
-                    <span>→</span>
-                    <a href="https://governor.ng" target="_blank">governor.ng</a>
-                    <span class="portfolio-badge">Studio OS</span>
+                    <a href="https://rhythmnflow.netlify.app" target="_blank" rel="noopener noreferrer">rhythmnflow.netlify.app</a>
+                </div>
+                <div class="portfolio-item">
+                    <a href="https://namhtofoods.com" target="_blank" rel="noopener noreferrer">namhtofoods.com</a>
+                </div>
+                <div class="portfolio-item">
+                    <a href="https://dsinterna.netlify.app" target="_blank" rel="noopener noreferrer">dsinterna.netlify.app</a>
                 </div>
             </div>
         </div>
 
-        <!-- Systems -->
-        <div class="category" id="systems">Complete Systems</div>
-        <div class="systems-grid">
-            <!-- Business OS -->
-            <div class="system-card">
-                <div class="system-title">
-                    Business Operating System
-                    <span>4–6 wks</span>
-                </div>
-                <div class="system-description">
-                    Website + client portal + content scheduler + project tracker.
-                </div>
-                <div class="system-includes">
-                    → Website (5-7 pages) · Client portal · Project tracker · Content scheduler · 2hr training · 30-day support
-                </div>
-                <div class="system-meta">
-                    <span class="system-price">From ₦950K</span>
-                    <button class="request-btn" onclick="selectPackage('Business Operating System', '950K')">Request</button>
-                </div>
-            </div>
-
-            <!-- E-commerce Platform -->
-            <div class="system-card">
-                <div class="system-title">
-                    E-commerce Platform
-                    <span>4–6 wks</span>
-                </div>
-                <div class="system-description">
-                    From product discovery to checkout. Inventory, orders, customers.
-                </div>
-                <div class="system-includes">
-                    → Product catalog · Shopping cart · Inventory tracking · Order management · Payment gateway
-                </div>
-                <div class="system-meta">
-                    <span class="system-price">From ₦950K</span>
-                    <button class="request-btn" onclick="selectPackage('E-commerce Platform', '950K')">Request</button>
-                </div>
-            </div>
-
-            <!-- App System -->
-            <div class="system-card">
-                <div class="system-title">
-                    App System (No Store)
-                    <span>4–6 wks</span>
-                </div>
-                <div class="system-description">
-                    App-like experience on any device. Works offline.
-                </div>
-                <div class="system-includes">
-                    → Install on any device · Offline functionality · Push notifications · Fast loading · Analytics
-                </div>
-                <div class="system-meta">
-                    <span class="system-price">From ₦850K</span>
-                    <button class="request-btn" onclick="selectPackage('App System (No Store Required)', '850K')">Request</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="category">Workflow & Content</div>
-        <div class="systems-grid">
-            <!-- Content OS -->
-            <div class="system-card">
-                <div class="system-title">
-                    Content Operating System
-                    <span>3–4 wks</span>
-                </div>
-                <div class="system-description">
-                    Turn camera roll into scheduled content.
-                </div>
-                <div class="system-includes">
-                    → Batch photo processor · Multi-platform scheduler · Content calendar · Analytics · 5 social accounts
-                </div>
-                <div class="system-meta">
-                    <span class="system-price">From ₦750K</span>
-                    <button class="request-btn" onclick="selectPackage('Content Operating System', '750K')">Request</button>
-                </div>
-            </div>
-
-            <!-- Artist Portfolio -->
-            <div class="system-card">
-                <div class="system-title">
-                    Artist Portfolio System
-                    <span>3–5 wks</span>
-                </div>
-                <div class="system-description">
-                    Digital gallery + PDF portfolio generator.
-                </div>
-                <div class="system-includes">
-                    → Gallery with lightbox · PDF generator · Artist bio pages · Contact system · Image optimization
-                </div>
-                <div class="system-meta">
-                    <span class="system-price">From ₦750K</span>
-                    <button class="request-btn" onclick="selectPackage('Artist Portfolio System', '750K')">Request</button>
-                </div>
-            </div>
-
-            <!-- Content Management -->
-            <div class="system-card">
-                <div class="system-title">
-                    Content Management
-                    <span>2–3 wks</span>
-                </div>
-                <div class="system-description">
-                    Update your site yourself. No developer needed.
-                </div>
-                <div class="system-includes">
-                    → Custom admin interface · WYSIWYG editor · Media library · 1hr training
-                </div>
-                <div class="system-meta">
-                    <span class="system-price">From ₦300K</span>
-                    <button class="request-btn" onclick="selectPackage('Content Management', '300K')">Request</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="category">Data & Operations</div>
-        <div class="systems-grid">
-            <!-- Command Center -->
-            <div class="system-card">
-                <div class="system-title">
-                    Command Center
-                    <span>3–5 wks</span>
-                </div>
-                <div class="system-description">
-                    Live revenue, expenses, metrics—no spreadsheets.
-                </div>
-                <div class="system-includes">
-                    → Revenue dashboard · Expense tracking · Profit calculator · Exportable reports · Multi-currency
-                </div>
-                <div class="system-meta">
-                    <span class="system-price">From ₦600K</span>
-                    <button class="request-btn" onclick="selectPackage('Command Center', '600K')">Request</button>
-                </div>
-            </div>
-
-            <!-- Inventory Management -->
-            <div class="system-card">
-                <div class="system-title">
-                    Inventory Management
-                    <span>3–4 wks</span>
-                </div>
-                <div class="system-description">
-                    Track stock, get low inventory alerts, manage suppliers.
-                </div>
-                <div class="system-includes">
-                    → Stock level tracking · Low stock alerts · Product variants · Supplier management
-                </div>
-                <div class="system-meta">
-                    <span class="system-price">From ₦400K</span>
-                    <button class="request-btn" onclick="selectPackage('Inventory Management', '400K')">Request</button>
-                </div>
-            </div>
-
-            <!-- Discovery System -->
-            <div class="system-card">
-                <div class="system-title">
-                    Discovery System
-                    <span>2–3 wks</span>
-                </div>
-                <div class="system-description">
-                    User research, journey mapping, and strategy before you build.
-                </div>
-                <div class="system-includes">
-                    → 5 user interviews · Journey mapping · Wireframes & flows · Strategy document
-                </div>
-                <div class="system-meta">
-                    <span class="system-price">From ₦450K</span>
-                    <button class="request-btn" onclick="selectPackage('Discovery System', '450K')">Request</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Results -->
-        <div class="results" id="results">
-            <div class="category">Results</div>
-            <div class="results-grid">
-                <div class="result-card">
-                    <div class="quote-text">"Before, we had 14 spreadsheets and 6 WhatsApp groups. Now one dashboard runs everything. We reduced admin time by 60% and increased event profitability by 30%."</div>
-                    <div class="quote-meta">
-                        <span class="quote-company">Nonye C., Butterfly Effect</span>
-                        <span class="quote-metric">60% less admin · 30% more profit</span>
+        <!-- Offerings Accordion -->
+        <div class="offerings">
+            <div class="section-label" style="margin-bottom: 24px;">What I Build</div>
+            
+            <!-- Tier 1 -->
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">Information Websites & Portfolios</div>
+                    <div class="accordion-meta">
+                        <span class="accordion-price">From ₦300K</span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
                     </div>
                 </div>
-                <div class="result-card">
-                    <div class="quote-text">"The measurement tool cut returns by 40% and made customers confident shopping online. That's not a website—that's a business solution."</div>
-                    <div class="quote-meta">
-                        <span class="quote-company">Sally B., Mezer</span>
-                        <span class="quote-metric">40% fewer returns</span>
+                <div class="accordion-content">
+                    <div class="accordion-inner">
+                        <p>Perfect for establishing your brand presence. Clean, fast, and beautifully designed to convert visitors into believers.</p>
+                        <ul class="feature-list">
+                            <li>5-7 Page Business Website</li>
+                            <li>Artist/Creator Portfolio</li>
+                            <li>Content Management (Update it yourself)</li>
+                            <li>Timeline: 2–3 weeks</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tier 2 -->
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">E-commerce & Content Systems</div>
+                    <div class="accordion-meta">
+                        <span class="accordion-price">From ₦750K</span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-inner">
+                        <p>For creators and businesses ready to sell and manage content at scale.</p>
+                        <ul class="feature-list">
+                            <li>Full E-commerce Platform (Inventory & Checkout)</li>
+                            <li>Content Operating System (Batch Scheduler)</li>
+                            <li>Artist Portfolio with PDF Generator</li>
+                            <li>Timeline: 3–5 weeks</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tier 3 -->
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">Complete Business Operating Systems</div>
+                    <div class="accordion-meta">
+                        <span class="accordion-price">From ₦950K</span>
+                        <i class="fas fa-chevron-down accordion-icon"></i>
+                    </div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-inner">
+                        <p>Custom infrastructure that runs your entire operation. No more scattered spreadsheets.</p>
+                        <ul class="feature-list">
+                            <li>Business OS (Website + Client Portal + Tracker)</li>
+                            <li>App System (Installable, Offline-capable)</li>
+                            <li>Command Center (Live Revenue & Expenses)</li>
+                            <li>Timeline: 4–6 weeks</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -937,254 +593,85 @@
 
         <!-- Profile -->
         <div class="profile">
-            <img src="https://giddycloth.s6-tastewp.com/wp-content/uploads/2025/10/O.-Ibrahim-1-scaled.jpg" alt="Ibrahim Odey">
-            <div class="profile-content">
-                <p><strong>Ibrahim Odey</strong> — multidisciplinary creative who got tired of drowning in his own potential. Websites, macrame, beads, branding. Too many skills, no system. So he built tools that turned chaos into a sustainable studio. Now he builds the same for others.</p>
+            <img src="https://z-cdn-media.chatglm.cn/files/704d944c-bcef-4da6-a64e-c0243caee784.JPG?auth_key=1887176115-927ad2335d3a4170ba427c86e7d3d0ad-0-6fd419f42da9d929f752e44daad90ec8" alt="Ibrahim Odey" class="profile-img">
+            <div class="profile-text">
+                <p><strong>Ibrahim Odey</strong> — I listen before I build. By understanding the daily stress of your operations—how vendors move, how clients feel—I design digital tools that turn creative chaos into sustainable revenue.</p>
             </div>
         </div>
 
-        <!-- FAQ -->
-        <div class="faq-section" id="contact">
-            <div class="category">Quick answers</div>
-            
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    Do I own the system?
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">
-                    Yes. You own the code, the design, everything. No monthly fees. Just hosting (₦5K–₦20K/month).
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    How long does it take?
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">
-                    2–6 weeks depending on complexity. Discovery call → Proposal → Build (weekly check-ins) → Launch with 30-day support.
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    What happens after I pay?
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">
-                    We start with a discovery call to map out exactly what you need. Then I build with weekly check-ins. When it's ready, we do a handoff call where I walk you through everything. You get 30 days of direct support after launch.
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    Can I add more systems later?
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">
-                    Absolutely. That's the point. Start with what you need most, then add components as you grow. Everything is built to work together.
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    How is this different from WordPress/Squarespace?
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">
-                    Templates force you to fit your business into someone else's idea of how things should work. I build custom systems that match your actual workflow. No plugins to update, no templates to fight.
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    I'm not technical. Will I be able to use it?
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">
-                    Yes. I build for creatives, not developers. You get training and documentation. If you can use Instagram, you can use these systems.
-                </div>
-            </div>
-        </div>
-
-        <!-- Form with guidance mini -->
-        <div class="form-section hidden" id="formSection">
-            <div class="guidance-mini">
-                <p><i class="fas fa-question-circle"></i> Not sure which system fits?</p>
-                <a href="#" class="guidance-mini-btn" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/odey/20min'}); return false;">Book free call</a>
-            </div>
-
-            <div class="selected-package" id="selectedPackage">
-                <span>Requesting: <strong id="packageName">Business Operating System</strong> · <span id="packagePrice">₦950K</span></span>
-                <button onclick="clearSelection()" style="background:none; border:1px solid rgba(208,175,143,0.3); color:#D0AF8F; padding:6px 12px; border-radius:4px; cursor:pointer;">Change</button>
-            </div>
-
-            <div class="next-steps-notice">
-                <p><i class="fas fa-clock"></i> I'll respond within <strong>24 hours</strong> to schedule a discovery call.</p>
-            </div>
-
-            <form id="requestForm" name="system-request" method="POST" netlify data-netlify="true" onsubmit="return validateForm(event)">
-                <input type="hidden" name="form-name" value="system-request">
-                <input type="hidden" name="package" id="packageInput" value="">
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Name *</label>
-                        <input type="text" name="name" id="name" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Business</label>
-                        <input type="text" name="business" class="form-input">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Email *</label>
-                        <input type="email" name="email" id="email" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">WhatsApp (optional)</label>
-                        <input type="text" name="whatsapp" class="form-input" placeholder="+234...">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">What's broken? What takes too long? *</label>
-                    <textarea name="details" id="details" class="form-textarea" rows="3" required></textarea>
-                </div>
-
-                <p style="color:#888; font-size:13px; margin-bottom:16px;">Share links to any relevant files (Dropbox, Google Drive) in the message above.</p>
-
-                <button type="submit" class="form-submit" id="submitBtn">Send request →</button>
-                <div id="formMessage" class="form-message"></div>
-            </form>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            <div>© 2025 Ray of Light — <span>Ibrahim Odey</span> · 7 years · 150+ projects</div>
-            <div>
-                <a href="mailto:odey.helpdesk@gmail.com">Email</a>
-                <a href="#">LinkedIn</a>
-            </div>
+        <!-- CTA -->
+        <div class="cta-section" id="contact">
+            <h2>Ready to build?</h2>
+            <p>Whether you just need a simple website or a full system, let's map it out.</p>
+            <button class="cta-btn" onclick="openPanel()">Start a Project</button>
         </div>
     </div>
 
+    <!-- Slide-out Panel & Overlay -->
+    <div class="panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
+    
+    <div class="project-panel" id="projectPanel">
+        <div class="panel-header">
+            <div class="panel-title">Project Brief</div>
+            <button class="close-panel" onclick="closePanel()"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <form onsubmit="event.preventDefault(); alert('Thank you. I will respond within 24 hours.'); closePanel();">
+            <div class="form-group">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-input" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Business / Brand Name</label>
+                <input type="text" class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">What do you need? (Website, Store, Full System)</label>
+                <textarea class="form-textarea" required></textarea>
+            </div>
+            
+            <button type="submit" class="submit-btn">Send Request</button>
+        </form>
+    </div>
+
     <!-- WhatsApp Float -->
-    <a href="https://wa.me/234..." class="whatsapp-float" target="_blank">
+    <a href="https://wa.me/2349012550483" target="_blank" rel="noopener noreferrer" class="whatsapp-float">
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <!-- Calendly -->
-    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
-    <script src="https://assets.calendly.com/assets/external/widget.js" type="async"></script>
-
     <script>
-        // Mobile menu toggle
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            menu.classList.toggle('active');
-            document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : '';
-        }
-
-        // Close mobile menu on escape
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                const menu = document.getElementById('mobileMenu');
-                if (menu.classList.contains('active')) {
-                    toggleMobileMenu();
-                }
+        // Accordion logic
+        function toggleAccordion(element) {
+            const item = element.parentElement;
+            const isActive = item.classList.contains('active');
+            
+            // Close all
+            document.querySelectorAll('.accordion-item').forEach(i => i.classList.remove('active'));
+            
+            // Open clicked if it was closed
+            if (!isActive) {
+                item.classList.add('active');
             }
-        });
-
-        // FAQ toggle
-        function toggleFaq(element) {
-            element.classList.toggle('active');
-            const answer = element.nextElementSibling;
-            answer.classList.toggle('active');
         }
 
-        // Package selection
-        function selectPackage(packageName, price) {
-            document.getElementById('packageName').textContent = packageName;
-            document.getElementById('packagePrice').textContent = '₦' + price;
-            document.getElementById('packageInput').value = packageName;
-            document.getElementById('formSection').classList.remove('hidden');
-            
-            setTimeout(() => {
-                document.getElementById('formSection').scrollIntoView({ behavior: 'smooth' });
-            }, 100);
+        // Panel logic
+        function openPanel() {
+            document.getElementById('projectPanel').classList.add('active');
+            document.getElementById('panelOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
 
-        function clearSelection() {
-            document.getElementById('formSection').classList.add('hidden');
-        }
-
-        // Form validation
-        function validateForm(event) {
-            event.preventDefault();
-            
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const details = document.getElementById('details').value.trim();
-            
-            if (!name || !email || !details) {
-                alert('Please fill in all required fields');
-                return false;
-            }
-            
-            if (!email.includes('@') || !email.includes('.')) {
-                alert('Please enter a valid email');
-                return false;
-            }
-            
-            submitForm();
-            return false;
-        }
-
-        // Form submission
-        function submitForm() {
-            const form = document.getElementById('requestForm');
-            const formData = new FormData(form);
-            
-            const submitBtn = document.getElementById('submitBtn');
-            const formMessage = document.getElementById('formMessage');
-            
-            submitBtn.textContent = 'Sending...';
-            submitBtn.disabled = true;
-            formMessage.style.display = 'none';
-            
-            fetch('/', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (response.ok) {
-                    formMessage.style.display = 'block';
-                    formMessage.className = 'form-message success';
-                    formMessage.textContent = 'Thanks! I\'ll respond within 24 hours.';
-                    
-                    form.reset();
-                    
-                    setTimeout(() => {
-                        document.getElementById('formSection').classList.add('hidden');
-                        formMessage.style.display = 'none';
-                    }, 5000);
-                } else {
-                    throw new Error('Submission failed');
-                }
-            })
-            .catch(error => {
-                formMessage.style.display = 'block';
-                formMessage.className = 'form-message error';
-                formMessage.textContent = 'Something went wrong. Email directly: odey.helpdesk@gmail.com';
-            })
-            .finally(() => {
-                submitBtn.textContent = 'Send request →';
-                submitBtn.disabled = false;
-            });
+        function closePanel() {
+            document.getElementById('projectPanel').classList.remove('active');
+            document.getElementById('panelOverlay').classList.remove('active');
+            document.body.style.overflow = 'auto';
         }
     </script>
 </body>
