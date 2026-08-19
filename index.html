@@ -49,7 +49,7 @@
         }
 
         .logo-img {
-            height: 60px;
+            height: 40px;
             width: auto;
             display: block;
         }
@@ -616,25 +616,25 @@
             <button class="close-panel" onclick="closePanel()"><i class="fas fa-times"></i></button>
         </div>
         
-        <form onsubmit="event.preventDefault(); alert('Thank you. I will respond within 24 hours.'); closePanel();">
+        <form id="projectForm" onsubmit="sendToWhatsApp(event)">
             <div class="form-group">
                 <label class="form-label">Name</label>
-                <input type="text" class="form-input" required>
+                <input type="text" id="formName" class="form-input" required>
             </div>
             
             <div class="form-group">
                 <label class="form-label">Email</label>
-                <input type="email" class="form-input" required>
+                <input type="email" id="formEmail" class="form-input" required>
             </div>
             
             <div class="form-group">
                 <label class="form-label">Business / Brand Name</label>
-                <input type="text" class="form-input">
+                <input type="text" id="formBusiness" class="form-input">
             </div>
             
             <div class="form-group">
                 <label class="form-label">What do you need? (Website, Store, Full System)</label>
-                <textarea class="form-textarea" required></textarea>
+                <textarea id="formDetails" class="form-textarea" required></textarea>
             </div>
             
             <button type="submit" class="submit-btn">Send Request</button>
@@ -672,6 +672,36 @@
             document.getElementById('projectPanel').classList.remove('active');
             document.getElementById('panelOverlay').classList.remove('active');
             document.body.style.overflow = 'auto';
+        }
+
+        // Send Form to WhatsApp
+        function sendToWhatsApp(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('formName').value;
+            const email = document.getElementById('formEmail').value;
+            const business = document.getElementById('formBusiness').value;
+            const details = document.getElementById('formDetails').value;
+
+            // Construct the message
+            let message = `*New Project Request*\n\n`;
+            message += `*Name:* ${name}\n`;
+            message += `*Email:* ${email}\n`;
+            if (business) {
+                message += `*Business / Brand:* ${business}\n`;
+            }
+            message += `*Project Details:*\n${details}`;
+
+            // URL encode the message
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/2349012550483?text=${encodedMessage}`;
+
+            // Open WhatsApp in a new tab
+            window.open(whatsappUrl, '_blank');
+
+            // Close the panel and reset the form
+            closePanel();
+            document.getElementById('projectForm').reset();
         }
     </script>
 </body>
